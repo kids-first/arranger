@@ -138,8 +138,8 @@ export default ({ type, Parallel }) => async (
   { es },
   info,
 ) => {
-  let fields = getFields(info);
-  let nestedFields = type.nested_fields;
+  const fields = getFields(info);
+  const nestedFields = type.nested_fields;
 
   let query = filters;
 
@@ -184,7 +184,7 @@ export default ({ type, Parallel }) => async (
 
   const copyToSourceFields = findCopyToSourceFields(type.mapping);
 
-  let { hits } = await es.search({
+  const esQuery = {
     index: type.index,
     type: type.es_type,
     size: first,
@@ -195,11 +195,22 @@ export default ({ type, Parallel }) => async (
     ],
     track_scores: !!score,
     body,
+  };
+  // console.log('esQuery: ', JSON.stringify(esQuery, null, 2));
+
+  let { hits } = await es.search(esQuery);
+
+  const edges = await hitsToEdges({
+    hits,
+    nestedFields,
+    Parallel,
+    copyToSourceFields,
   });
+  // console.log('nestedFields: ', nestedFields);
+  // console.log('edges: ', JSON.stringify(edges));
 
   return {
-    edges: () =>
-      hitsToEdges({ hits, nestedFields, Parallel, copyToSourceFields }),
+    edges: () => edges,
     total: () => hits.total,
   };
 };

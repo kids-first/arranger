@@ -9,7 +9,8 @@ import getAllData from '../utils/getAllData';
 import dataToTSV from '../utils/dataToTSV';
 
 export default function({ projectId, io }) {
-  function makeTSV(args) {
+  const makeTSV = args => {
+    console.log('args: ', args);
     return getAllData({
       projectId,
       ...args,
@@ -20,7 +21,7 @@ export default function({ projectId, io }) {
         first: 1000,
       }),
     }).pipe(dataToTSV(args));
-  }
+  };
 
   function multipleFiles({ files, mock, chunkSize }) {
     const pack = tar.pack();
