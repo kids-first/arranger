@@ -8,12 +8,15 @@ import getAllData from '../utils/getAllData';
 import dataToTSV from '../utils/dataToTSV';
 
 export default function({ projectId, io }) {
-  const makeTSV = ({ es, projectId }) => async args =>
-    (await getAllData({
+  const makeTSV = ({ es, projectId }) => async args =>{
+    const stream = await getAllData({
       projectId,
       es,
       ...args,
-    })).pipe(dataToTSV(args));
+    })
+    const output = stream.pipe(dataToTSV({...args, onComplete: () => stream.end()}))
+    return output
+  }
 
   function multipleFiles({ files, mock, chunkSize, es }) {
     const pack = tar.pack();

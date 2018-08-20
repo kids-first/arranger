@@ -11,6 +11,7 @@ export default async ({
   sort = [],
   sqon,
   chunkSize = DOWNLOAD_STREAM_BUFFER_SIZE,
+  onComplete = () => {},
   ...rest
 }) => {
   const stream = new PassThrough({ objectMode: true });
@@ -61,7 +62,7 @@ export default async ({
       const total = data[index].hits.total;
       const steps = Array(Math.ceil(total / chunkSize)).fill();
       // async reduce because each cycle is dependent on result of the previous
-      return steps.reduce(async previous => {
+      return steps.reduce(async (previous, _, chunkIndex) => {
         const previousHits = await previous;
         console.time(`EsQuery`);
         const hits = await es
@@ -83,11 +84,13 @@ export default async ({
           })
           .then(toHits);
         console.timeEnd(`EsQuery`);
-        stream.write({ hits, total });
+        setTimeout(() => {
+          stream.write({ hits, total, chunkCount: steps.length, chunkIndex });
+        }, 0);
         return hits;
       }, Promise.resolve());
     })
-    .then(() => stream.end())
+    .then(() => onComplete())
     .catch(console.error);
   return stream;
 };

@@ -102,11 +102,20 @@ export const dataToTSV = ({
     }),
   ).join('\n') + '\n';
 
-export default ({ index, columns, uniqueBy, emptyValue = '--' }) => {
+export default ({
+  index,
+  columns,
+  uniqueBy,
+  emptyValue = '--',
+  onComplete = () => {},
+}) => {
   let isFirst = true;
-  let chunkCounts = 0;
-  return through2.obj(function({ hits, total }, enc, callback) {
-    console.time(`esHitsToTsv_${chunkCounts}`);
+  return through2.obj(function(
+    { hits, total, chunkCount, chunkIndex },
+    enc,
+    callback,
+  ) {
+    console.time(`dataToTSV_${chunkIndex}`);
     const pipe = this;
     if (isFirst) {
       isFirst = false;
@@ -127,7 +136,10 @@ export default ({ index, columns, uniqueBy, emptyValue = '--' }) => {
     }
 
     callback();
-    console.timeEnd(`esHitsToTsv_${chunkCounts}`);
-    chunkCounts++;
+    console.timeEnd(`dataToTSV_${chunkIndex}`);
+
+    if (chunkIndex >= chunkCount - 1) {
+      onComplete();
+    }
   });
 };
