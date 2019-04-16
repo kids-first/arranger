@@ -49,7 +49,7 @@ const convertUnit = (sourceUnit, targetUnit) => num => {
     : num;
 };
 
-export const RangeFilterUi = props => {
+export const RangeFilterUI = props => {
   const {
     field: fieldName = null,
     sqonPath = [],
@@ -233,7 +233,7 @@ const RangeFilter = ({
   unit = null,
   field,
 }) => (
-  <RangeFilterUi
+  <RangeFilterUI
     field={field}
     ContainerComponent={ContainerComponent}
     sqonPath={sqonPath}
@@ -259,5 +259,7 @@ RangeFilter.prototype = {
   InputComponent: PropTypes.func,
   unit: PropTypes.string,
 };
+// Temporarily support both export: RangeFilterUI and RangeFilterUi
+export const RangeFilterUi = RangeFilterUI;
 
 export default RangeFilter;

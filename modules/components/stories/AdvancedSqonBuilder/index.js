@@ -9,9 +9,7 @@ import TermFilter, {
   TermFilterUI,
 } from '../../src/AdvancedSqonBuilder/filterComponents/TermFilter';
 import { BooleanFilterUI } from '../../src/AdvancedSqonBuilder/filterComponents/BooleanFilter';
-import RangeFilter, {
-  RangeFilterUi,
-} from '../../src/AdvancedSqonBuilder/filterComponents/RangeFilter';
+import { RangeFilterUI } from '../../src/AdvancedSqonBuilder/filterComponents/RangeFilter';
 
 import {
   sqons as mockSqons,
@@ -245,7 +243,7 @@ storiesOf('AdvancedSqonBuilder', module)
   })
   .add('filters/RangeFilter', () => {
     return (
-      <RangeFilterUi
+      <RangeFilterUI
         field={''}
         sqonPath={[1, 2, 0]}
         initialSqon={mockSqons[2]}
