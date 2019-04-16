@@ -37,8 +37,6 @@ const FieldOpModifier = ({
         ({ field: _field }) => field === _field,
       );
 
-      // temporary, needs to handle errors too
-      console.log('fieldExtendedMapping: ', fieldExtendedMapping);
       const { type, unit } = fieldExtendedMapping || {};
       return ['keyword', 'id'].includes(type) ? (
         <TermFilter
