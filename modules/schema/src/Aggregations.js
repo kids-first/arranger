@@ -20,5 +20,6 @@ export let typeDefs = `
 
   type Aggregations {
     buckets: [Bucket]
+    cardinality(precision_threshold:Int): Int
   }
 `;
