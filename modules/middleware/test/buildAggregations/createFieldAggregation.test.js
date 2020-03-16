@@ -27,3 +27,35 @@ test('it should handle multiple aggregation types per field', () => {
 
   expect(createFieldAggregation(input)).toEqual(output);
 });
+
+test('it should compute aggregation cardinality (for field files.kf_id)', () => {
+  const input = {
+    field: 'files.kf_id',
+    graphqlField: {
+      cardinality: {},
+    },
+    isNested: 1,
+  };
+  const output = {
+    'files.kf_id:cardinality': {
+      cardinality: { field: 'files.kf_id', precision_threshold: 40000 },
+    },
+  };
+  expect(createFieldAggregation(input)).toEqual(output);
+});
+
+test('it should compute aggregation cardinality (for field family_id)', () => {
+  const input = {
+    field: 'family_id',
+    graphqlField: {
+      cardinality: {},
+    },
+    isNested: 0,
+  };
+  const output = {
+    'family_id:cardinality': {
+      cardinality: { field: 'family_id', precision_threshold: 40000 },
+    },
+  };
+  expect(createFieldAggregation(input)).toEqual(output);
+});
