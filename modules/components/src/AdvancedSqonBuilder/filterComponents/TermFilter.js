@@ -1,6 +1,7 @@
 import React from 'react';
 import Component from 'react-component-component';
-import { sortBy, get } from 'lodash';
+import sortBy from 'lodash/sortBy';
+import get from 'lodash/get';
 
 import './FilterContainerStyle.css';
 import { FilterContainer } from './common';

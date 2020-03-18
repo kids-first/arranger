@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import InputRange from 'react-input-range';
 import convert from 'convert-units';
-import _ from 'lodash';
+import isNil from 'lodash/isNil';
 
 import { replaceSQON } from '../SQONView/utils';
 import AggsWrapper from './AggsWrapper';
@@ -48,8 +48,8 @@ class RangeAgg extends Component {
       unit: unit,
       displayUnit: supportedConversionFromUnit(unit)?.[0],
       value: {
-        min: !_.isNil(value) ? value.min || min : min,
-        max: !_.isNil(value) ? value.max || max : max,
+        min: !isNil(value) ? value.min || min : min,
+        max: !isNil(value) ? value.max || max : max,
       },
     };
   }
@@ -136,7 +136,7 @@ class RangeAgg extends Component {
         }`}
         {...{ WrapperComponent, collapsible }}
       >
-        {[!_.isNil(min), !_.isNil(max)].every(Boolean) && (
+        {[!isNil(min), !isNil(max)].every(Boolean) && (
           <div className="range-wrapper">
             <div className="unit-wrapper">
               {supportedConversions?.length > 1 &&

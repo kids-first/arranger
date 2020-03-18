@@ -1,5 +1,5 @@
 import React from 'react';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import aggComponentsMap from '../Aggs/aggComponentsMap';
 import TextHighlight from '../TextHighlight';
 

@@ -1,6 +1,7 @@
 import columnTypes from './columnTypes';
 import { withProps } from 'recompose';
-import { isNil, sortBy } from 'lodash';
+import isNil from 'lodash/isNil';
+import sortBy from 'lodash/sortBy';
 
 export function getSingleValue(data) {
   if (typeof data === 'object' && data) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { noop } from 'lodash';
+import noop from 'lodash/noop';
 import State from '../State';
 import ColumnsConfigTable from '../Admin/ColumnsConfigTable';
 import AddCustomColumn from './AddCustomColumn';

@@ -1,6 +1,6 @@
 import React from 'react';
 import Dragula from 'dragula';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 export default Component => {
   const wrapper = class RTDragColumnTable extends React.Component {

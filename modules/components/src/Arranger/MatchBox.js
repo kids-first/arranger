@@ -1,5 +1,8 @@
 import React, { Fragment } from 'react';
-import { capitalize, difference, get, uniqBy } from 'lodash';
+import capitalize from 'lodash/capitalize';
+import difference from 'lodash/difference';
+import get from 'lodash/get';
+import uniqBy from 'lodash/uniqBy';
 import { compose, withState, withHandlers } from 'recompose';
 import { css } from 'emotion';
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { compose, withState } from 'recompose';
-import { isEmpty, truncate } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import truncate from 'lodash/truncate';
 import DefaultSearchIcon from 'react-icons/lib/fa/search';
 import { css } from 'emotion';
 

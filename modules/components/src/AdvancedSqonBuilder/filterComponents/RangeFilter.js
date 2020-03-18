@@ -1,6 +1,7 @@
 import React from 'react';
 import Component from 'react-component-component';
-import { min, max } from 'lodash';
+import min from 'lodash/min';
+import max from 'lodash/max';
 import PropTypes from 'prop-types';
 import convert from 'convert-units';
 import './FilterContainerStyle.css';

@@ -16,7 +16,7 @@ import { PROJECT_ID } from '../../utils/config';
 import defaultApi from '../../utils/api';
 import 'react-tippy/dist/tippy.css';
 import { Tooltip } from 'react-tippy';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import internalTranslateSQONValue from '../../utils/translateSQONValue';
 
 const formatDisplayValue = raw => {

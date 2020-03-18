@@ -1,6 +1,6 @@
 import React from 'react';
 import Component from 'react-component-component';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import { BrowserRouter, Route, Link, Redirect, Switch } from 'react-router-dom';
 import urlJoin from 'url-join';
 

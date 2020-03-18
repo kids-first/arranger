@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { isEqual, debounce } from 'lodash';
+import isEqual from 'lodash/isEqual';
+import debounce from 'lodash/debounce';
 import path from 'path';
 import defaultApi from './utils/api';
 import { defaultProps } from 'recompose';

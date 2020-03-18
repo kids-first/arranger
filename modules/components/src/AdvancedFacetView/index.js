@@ -1,6 +1,8 @@
 import React from 'react';
-import { keys, debounce, isEqual } from 'lodash';
-import { pick } from 'lodash';
+import keys from 'lodash/keys';
+import debounce from 'lodash/debounce';
+import isEqual from 'lodash/isEqual';
+import pick from 'lodash/pick';
 import { css } from 'emotion';
 import Component from 'react-component-component';
 

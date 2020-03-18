@@ -1,4 +1,5 @@
-import { capitalize, uniq } from 'lodash';
+import capitalize from 'lodash/capitalize';
+import uniq from 'lodash/uniq';
 import { compose, withProps } from 'recompose';
 import { withQuery } from '../../Query';
 

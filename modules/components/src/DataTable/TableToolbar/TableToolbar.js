@@ -1,6 +1,6 @@
 import React from 'react';
 import { compose, withProps, withPropsOnChange, withState } from 'recompose';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import pluralize from 'pluralize';
 
 import { currentFilterValue } from '../../SQONView/utils';

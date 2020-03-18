@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import Spinner from 'react-spinkit';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import Query from '../Query';
 import { AggsState } from '../Aggs';

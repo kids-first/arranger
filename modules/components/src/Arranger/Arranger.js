@@ -1,5 +1,5 @@
 import React from 'react';
-import { get, pick } from 'lodash';
+import get from 'lodash/get';
 
 import columnsToGraphql from '@kfarranger/mapping-utils/dist/utils/columnsToGraphql';
 
@@ -63,6 +63,7 @@ class Arranger extends React.Component {
       component,
       api = defaultApi,
     } = this.props;
+
     const { sqon, selectedTableRows } = this.state;
 
     const childProps = {

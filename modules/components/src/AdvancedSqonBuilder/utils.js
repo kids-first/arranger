@@ -1,7 +1,7 @@
 import React from 'react';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { view, set, lensPath as lens } from 'ramda';
-import { flattenDeep } from 'lodash';
+import flattenDeep from 'lodash/flattenDeep';
 
 /**
  * todo: these magic sqon values should be centralized across Arranger

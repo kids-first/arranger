@@ -1,7 +1,8 @@
 import { Component } from 'react';
-import { debounce, sortBy } from 'lodash';
+import debounce from 'lodash/debounce';
+import sortBy from 'lodash/sortBy';
 import defaultApi from '../utils/api';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { esToAggTypeMap } from '@kfarranger/mapping-utils';
 
 let aggFields = `
