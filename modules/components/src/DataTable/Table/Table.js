@@ -1,5 +1,9 @@
 import React from 'react';
-import { get, intersection, isEmpty, xor, noop } from 'lodash';
+import get from 'lodash/get';
+import intersection from 'lodash/intersection';
+import isEmpty from 'lodash/isEmpty';
+import xor from 'lodash/xor';
+import noop from 'lodash/noop';
 import { compose, defaultProps } from 'recompose';
 import jsonpath from 'jsonpath/jsonpath.min';
 import DetectScrollbarSize from 'react-scrollbar-size';

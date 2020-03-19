@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Component from 'react-component-component';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import { getOperationAtPath, setSqonAtPath, IN_OP } from '../utils';
 import defaultApi from '../../utils/api';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import { AggsState } from '../Aggs';
 import Query from '../Query';

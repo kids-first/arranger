@@ -1,7 +1,8 @@
-import { capitalize, flatMap } from 'lodash';
+import capitalize from 'lodash/capitalize';
+import flatMap from 'lodash/flatMap';
 import { compose, withProps } from 'recompose';
 import jp from 'jsonpath/jsonpath.min';
-import { head, isArray } from 'lodash';
+import isArray from 'lodash/isArray';
 
 import { withQuery } from '../../Query';
 import splitString from '../../utils/splitString';

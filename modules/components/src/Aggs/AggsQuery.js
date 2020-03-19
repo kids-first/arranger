@@ -1,5 +1,5 @@
 import React from 'react';
-import { capitalize } from 'lodash';
+import capitalize from 'lodash/capitalize';
 import Query from '../Query';
 import defaultApi from '../utils/api';
 import { queryFromAgg } from './AggsState';

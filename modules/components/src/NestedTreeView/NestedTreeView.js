@@ -16,11 +16,12 @@ const NestedTreeView = ({
   shouldCollapse = () => undefined,
 }) =>
   dataSource.map(({ title, id, children, path }, i) => {
+    const pathOrDefaultLoopIndex = path || i;
     const selectedClass = selectedPath === path ? 'selected' : '';
     const depthClass = `depth_${depth}`;
     return children ? (
       <ReactTreeView
-        key={path}
+        key={pathOrDefaultLoopIndex}
         nodeLabel={({ open }) => (
           <div
             className={`label ${css`
@@ -61,7 +62,7 @@ const NestedTreeView = ({
     ) : (
       <div
         onClick={() => onLeafSelect(path)}
-        key={path}
+        key={pathOrDefaultLoopIndex}
         className={`NestedTreeViewNode tree-view_children leaf
           ${depthClass}
           ${selectedClass}

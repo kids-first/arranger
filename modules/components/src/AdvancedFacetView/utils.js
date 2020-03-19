@@ -1,4 +1,6 @@
-import { keys, orderBy, partition } from 'lodash';
+import keys from 'lodash/keys';
+import orderBy from 'lodash/orderBy';
+import partition from 'lodash/partition';
 import { mappingToDisplayTreeData } from '@kfarranger/mapping-utils';
 
 import strToReg from '../utils/strToReg';

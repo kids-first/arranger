@@ -1,5 +1,5 @@
 import React from 'react';
-import { noop } from 'lodash';
+import noop from 'lodash/noop';
 import State from '../State';
 import AggsConfigTable from '../Admin/AggsConfigTable';
 

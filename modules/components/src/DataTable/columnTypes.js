@@ -1,5 +1,5 @@
 import React from 'react';
-import { isNil } from 'lodash';
+import isNil from 'lodash/isNil';
 import filesize from 'filesize';
 import { getSingleValue } from './utils';
 import jsonPath from 'jsonpath/jsonpath.min';

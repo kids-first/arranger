@@ -1,5 +1,6 @@
 import { Component } from 'react';
-import { debounce, sortBy } from 'lodash';
+import debounce from 'lodash/debounce';
+import sortBy from 'lodash/sortBy';
 
 import defaultApi from '../utils/api';
 

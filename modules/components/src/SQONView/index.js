@@ -1,7 +1,8 @@
 // @flow
 import React from 'react';
 // $FlowIgnore
-import { take, xor } from 'lodash';
+import take from 'lodash/take';
+import xor from 'lodash/xor';
 import {
   compose,
   withState,

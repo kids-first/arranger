@@ -1,5 +1,5 @@
 import React from 'react';
-import { toPairs, sortBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
 import { css } from 'emotion';
 import ReactGridLayout from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';

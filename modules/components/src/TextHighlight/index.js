@@ -1,6 +1,6 @@
 import React from 'react';
 import { css } from 'emotion';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import strToReg from '../utils/strToReg';
 

@@ -2,7 +2,7 @@ import React from 'react';
 import Component from 'react-component-component';
 import FaRegClone from 'react-icons/lib/fa/clone';
 import FaTrashAlt from 'react-icons/lib/fa/trash';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import BooleanOp from './sqonPieces/BooleanOp';
 import {

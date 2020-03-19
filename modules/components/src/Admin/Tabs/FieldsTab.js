@@ -1,5 +1,6 @@
 import React from 'react';
-import { startCase, sortBy } from 'lodash';
+import startCase from 'lodash/startCase';
+import sortBy from 'lodash/sortBy';
 import convert from 'convert-units';
 import State from '../../State';
 import api from '../../utils/api';

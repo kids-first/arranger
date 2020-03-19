@@ -1,5 +1,5 @@
 import React from 'react';
-import { sortBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
 
 import { AggsState, AggsQuery } from '../Aggs';
 import aggComponents from '../Aggs/aggComponentsMap.js';

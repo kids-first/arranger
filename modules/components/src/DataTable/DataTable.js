@@ -1,5 +1,5 @@
 import React from 'react';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import urlJoin from 'url-join';
 
 import { ARRANGER_API, PROJECT_ID } from '../utils/config';

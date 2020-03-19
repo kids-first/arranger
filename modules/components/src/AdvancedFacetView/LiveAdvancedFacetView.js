@@ -1,7 +1,7 @@
 import React from 'react';
 import { esToAggTypeMap } from '@kfarranger/mapping-utils';
 import AdvancedFacetView from './';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import defaultApi from '../utils/api';
 
 const fetchGraphqlQuery = async ({

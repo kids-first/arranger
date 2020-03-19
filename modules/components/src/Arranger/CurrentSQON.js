@@ -1,7 +1,7 @@
 import React from 'react';
 import { compose } from 'recompose';
 import Component from 'react-component-component';
-import { truncate } from 'lodash';
+import truncate from 'lodash/truncate';
 
 import SQONView, { Value, Bubble, Field } from '../SQONView';
 import { fetchExtendedMapping } from '../utils/api';
