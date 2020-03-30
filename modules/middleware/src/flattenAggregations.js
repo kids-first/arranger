@@ -17,16 +17,15 @@ function flattenAggregations({ aggregations, includeMissing = true }) {
         ...prunedAggs,
         [field]: { ...prunedAggs[field], [aggregationType]: value.value },
       };
-    } else if (TOPHITS === aggregationType && Array.isArray(value.buckets) ) {
+    } else if (TOPHITS === aggregationType && Array.isArray(value.buckets)) {
       return {
         ...prunedAggs,
         [field]: {
-          top_hits: value.buckets
-            .map(b => ({
-              key: b.key,
-              doc_count: b.doc_count,
-              hits: b[`${field}.hits`]?.hits?.hits[0]?._source || {}
-            }))
+          top_hits: value.buckets.map(b => ({
+            key: b.key,
+            doc_count: b.doc_count,
+            hits: b[`${field}.hits`]?.hits?.hits[0]?._source || {},
+          })),
         },
       };
     } else if (Array.isArray(value.buckets)) {

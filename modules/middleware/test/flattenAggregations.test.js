@@ -372,8 +372,12 @@ test('flattenAggregations (top_hits)', () => {
   const output = {
     'observed_phenotype.name': {
       top_hits: [
-        { key: 'All (HP:0000001)', doc_count: 3, hits: { parents: [], }},
-        { key: 'Phenotypic abnormality (HP:0000118)', doc_count: 3 , hits: { parents: ['All (HP:0000001)'], }},
+        { key: 'All (HP:0000001)', doc_count: 3, hits: { parents: [] } },
+        {
+          key: 'Phenotypic abnormality (HP:0000118)',
+          doc_count: 3,
+          hits: { parents: ['All (HP:0000001)'] },
+        },
       ],
     },
   };

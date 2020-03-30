@@ -46,11 +46,12 @@ const createTopHitsAggregation = ({ field, graphqlField }) => {
       aggs: {
         [`${field}.hits`]: {
           top_hits: {
-            _source: [source?._source?.value || ""], size: size?.size?.value
-          }
-        }
+            _source: [source?._source?.value || ''],
+            size: size?.size?.value,
+          },
+        },
       },
-    }
+    },
   };
 };
 
@@ -73,11 +74,7 @@ const computeCardinalityAggregation = ({ field, graphqlField }) => ({
 /**
  * graphqlFields: output from `graphql-fields` (https://github.com/robrichard/graphql-fields)
  */
-export default ({
-  field,
-  graphqlField = {},
-  isNested = false
-}) => {
+export default ({ field, graphqlField = {}, isNested = false }) => {
   const types = [BUCKETS, STATS, HISTOGRAM, CARDINALITY, TOPHITS].filter(
     t => graphqlField[t],
   );
