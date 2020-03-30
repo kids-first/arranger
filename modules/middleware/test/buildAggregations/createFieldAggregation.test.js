@@ -59,3 +59,19 @@ test('it should compute aggregation cardinality (for field family_id)', () => {
   };
   expect(createFieldAggregation(input)).toEqual(output);
 });
+
+test('it should compute top hits aggregation', () => {
+  const input = {
+    size: 1,
+    source: ['observed_Phenotype.parents'],
+    graphqlField: {
+      top_hits: {},
+    },
+  };
+  const output = {
+    'observed_Phenotype.parents:top_hits': {
+      top_hits: { _source: ['observed_Phenotype.parents'], size: 1 },
+    },
+  };
+  expect(createFieldAggregation(input)).toEqual(output);
+});

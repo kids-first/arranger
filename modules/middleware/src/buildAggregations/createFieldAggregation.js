@@ -1,5 +1,6 @@
 import get from 'lodash/get';
-import { STATS, HISTOGRAM, BUCKETS, CARDINALITY } from '../constants';
+import { STATS, HISTOGRAM, BUCKETS, CARDINALITY, TOPHITS } from '../constants';
+import dialog from 'eslint-plugin-jsx-a11y/lib/util/implicitRoles/dialog';
 
 const MAX_AGGREGATION_SIZE = 300000;
 const HISTOGRAM_INTERVAL_DEFAULT = 1000;
@@ -35,6 +36,24 @@ const createTermAggregation = ({ field, isNested }) => {
   };
 };
 
+const createTopHitsAggregation = ({ field, graphqlField }) => {
+  const source = get(graphqlField, [TOPHITS, '__arguments', 0]) || [];
+  const size = get(graphqlField, [TOPHITS, '__arguments', 1]) || [];
+
+  return {
+    [`${field}:${TOPHITS}`]: {
+      terms: { field, size: MAX_AGGREGATION_SIZE },
+      aggs: {
+        [`${field}.hits`]: {
+          top_hits: {
+            _source: [source?._source?.value || ""], size: size?.size?.value
+          }
+        }
+      },
+    }
+  };
+};
+
 const getPrecisionThreshold = graphqlField => {
   const args = get(graphqlField, [CARDINALITY, '__arguments', 0], {});
   return (
@@ -54,8 +73,12 @@ const computeCardinalityAggregation = ({ field, graphqlField }) => ({
 /**
  * graphqlFields: output from `graphql-fields` (https://github.com/robrichard/graphql-fields)
  */
-export default ({ field, graphqlField = {}, isNested = false }) => {
-  const types = [BUCKETS, STATS, HISTOGRAM, CARDINALITY].filter(
+export default ({
+  field,
+  graphqlField = {},
+  isNested = false
+}) => {
+  const types = [BUCKETS, STATS, HISTOGRAM, CARDINALITY, TOPHITS].filter(
     t => graphqlField[t],
   );
   return types.reduce((acc, type) => {
@@ -73,6 +96,11 @@ export default ({ field, graphqlField = {}, isNested = false }) => {
       return {
         ...acc,
         ...computeCardinalityAggregation({ field, graphqlField }),
+      };
+    } else if (type === TOPHITS) {
+      return {
+        ...acc,
+        ...createTopHitsAggregation({ field, graphqlField }),
       };
     } else {
       return acc;

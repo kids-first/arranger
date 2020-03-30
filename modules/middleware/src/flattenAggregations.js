@@ -1,5 +1,5 @@
 import get from 'lodash/get';
-import { HISTOGRAM, STATS, MISSING, CARDINALITY } from './constants';
+import { HISTOGRAM, STATS, MISSING, CARDINALITY, TOPHITS } from './constants';
 
 function flattenAggregations({ aggregations, includeMissing = true }) {
   return Object.entries(aggregations).reduce((prunedAggs, [key, value]) => {
@@ -16,6 +16,18 @@ function flattenAggregations({ aggregations, includeMissing = true }) {
       return {
         ...prunedAggs,
         [field]: { ...prunedAggs[field], [aggregationType]: value.value },
+      };
+    } else if (TOPHITS === aggregationType && Array.isArray(value.buckets) ) {
+      return {
+        ...prunedAggs,
+        [field]: {
+          top_hits: value.buckets
+            .map(b => ({
+              key: b.key,
+              doc_count: b.doc_count,
+              hits: b[`${field}.hits`]?.hits?.hits[0]?._source || {}
+            }))
+        },
       };
     } else if (Array.isArray(value.buckets)) {
       const missing = get(aggregations, [`${field}:missing`]);

@@ -306,3 +306,77 @@ test('flattenAggregations (cardinality)', () => {
   const actualOutput = flattenAggregations({ aggregations: input });
   expect(actualOutput).toEqual(output);
 });
+
+test('flattenAggregations (top_hits)', () => {
+  const input = {
+    'observed_phenotype.name:nested': {
+      doc_count: 55,
+      'observed_phenotype.name:top_hits': {
+        doc_count_error_upper_bound: 0,
+        sum_other_doc_count: 0,
+        buckets: [
+          {
+            key: 'All (HP:0000001)',
+            doc_count: 3,
+            'observed_phenotype.name.hits': {
+              hits: {
+                total: 3,
+                max_score: 1,
+                hits: [
+                  {
+                    _index: 'participant_centric_sd_ynssaphe_re_ceg0c8wk',
+                    _type: 'participant_centric',
+                    _id: 'PT_29ZEF7YN',
+                    _nested: {
+                      field: 'observed_phenotype',
+                      offset: 15,
+                    },
+                    _score: 1,
+                    _source: {
+                      parents: [],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+          {
+            key: 'Phenotypic abnormality (HP:0000118)',
+            doc_count: 3,
+            'observed_phenotype.name.hits': {
+              hits: {
+                total: 3,
+                max_score: 1,
+                hits: [
+                  {
+                    _index: 'participant_centric_sd_ynssaphe_re_ceg0c8wk',
+                    _type: 'participant_centric',
+                    _id: 'PT_29ZEF7YN',
+                    _nested: {
+                      field: 'observed_phenotype',
+                      offset: 12,
+                    },
+                    _score: 1,
+                    _source: {
+                      parents: ['All (HP:0000001)'],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    },
+  };
+  const output = {
+    'observed_phenotype.name': {
+      top_hits: [
+        { key: 'All (HP:0000001)', doc_count: 3, hits: { parents: [], }},
+        { key: 'Phenotypic abnormality (HP:0000118)', doc_count: 3 , hits: { parents: ['All (HP:0000001)'], }},
+      ],
+    },
+  };
+  const actualOutput = flattenAggregations({ aggregations: input });
+  expect(actualOutput).toEqual(output);
+});
