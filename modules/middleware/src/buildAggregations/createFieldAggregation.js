@@ -23,34 +23,28 @@ const createNumericAggregation = ({ type, field, graphqlField }) => {
   };
 };
 
-const createTermAggregation = ({ field, isNested }) => {
+const createTermAggregation = ({ field, isNested, graphqlField }) => {
+  const topHits = graphqlField?.buckets?.top_hits || null;
+  const source = topHits?.__arguments[0]?._source || null;
+  const size = topHits?.__arguments[1]?.size || 1;
   return {
     [field]: {
       ...(isNested ? { aggs: { rn: { reverse_nested: {} } } } : {}),
       terms: { field, size: MAX_AGGREGATION_SIZE },
+      aggs: topHits
+        ? {
+            [`${field}.hits`]: {
+              top_hits: {
+                _source: [source?.value || ''],
+                size: size?.value,
+              },
+            },
+          }
+        : {},
     },
     [`${field}:missing`]: {
       ...(isNested ? { aggs: { rn: { reverse_nested: {} } } } : {}),
       missing: { field: field },
-    },
-  };
-};
-
-const createTopHitsAggregation = ({ field, graphqlField }) => {
-  const source = get(graphqlField, [TOPHITS, '__arguments', 0]) || [];
-  const size = get(graphqlField, [TOPHITS, '__arguments', 1]) || [];
-
-  return {
-    [`${field}:${TOPHITS}`]: {
-      terms: { field, size: MAX_AGGREGATION_SIZE },
-      aggs: {
-        [`${field}.hits`]: {
-          top_hits: {
-            _source: [source?._source?.value || ''],
-            size: size?.size?.value,
-          },
-        },
-      },
     },
   };
 };
@@ -82,7 +76,7 @@ export default ({ field, graphqlField = {}, isNested = false }) => {
     if (type === BUCKETS) {
       return {
         ...acc,
-        ...createTermAggregation({ field, isNested }),
+        ...createTermAggregation({ field, isNested, graphqlField }),
       };
     } else if ([STATS, HISTOGRAM].includes(type)) {
       return {
@@ -93,11 +87,6 @@ export default ({ field, graphqlField = {}, isNested = false }) => {
       return {
         ...acc,
         ...computeCardinalityAggregation({ field, graphqlField }),
-      };
-    } else if (type === TOPHITS) {
-      return {
-        ...acc,
-        ...createTopHitsAggregation({ field, graphqlField }),
       };
     } else {
       return acc;

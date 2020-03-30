@@ -371,16 +371,21 @@ test('flattenAggregations (top_hits)', () => {
   };
   const output = {
     'observed_phenotype.name': {
-      top_hits: [
-        { key: 'All (HP:0000001)', doc_count: 3, hits: { parents: [] } },
+      buckets: [
+        { key: 'All (HP:0000001)', doc_count: 3, top_hits: { parents: [] } },
         {
           key: 'Phenotypic abnormality (HP:0000118)',
           doc_count: 3,
-          hits: { parents: ['All (HP:0000001)'] },
+          top_hits: { parents: ['All (HP:0000001)'] },
         },
       ],
     },
   };
   const actualOutput = flattenAggregations({ aggregations: input });
-  expect(actualOutput).toEqual(output);
+  const actualBuckets = actualOutput['observed_phenotype.name'].buckets;
+  const outputBuckets = output['observed_phenotype.name'].buckets;
+
+  expect(actualBuckets.map(p => p.doc_count)).toEqual(outputBuckets.map(p => p.doc_count));
+  expect(actualBuckets.map(p => p.key)).toEqual(outputBuckets.map(p => p.key));
+  expect(actualBuckets.map(p => p.top_hits)).toEqual(outputBuckets.map(p => p.top_hits));
 });

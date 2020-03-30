@@ -62,15 +62,51 @@ test('it should compute aggregation cardinality (for field family_id)', () => {
 
 test('it should compute top hits aggregation', () => {
   const input = {
+    field: 'observed_phenotype.name',
     size: 1,
     source: ['observed_Phenotype.parents'],
     graphqlField: {
-      top_hits: {},
+      buckets: {
+        key: {},
+        doc_count: {},
+        top_hits: {
+          __arguments: [
+            {
+              _source: {
+                kind: 'StringValue',
+                value: 'observed_phenotype.parents',
+              },
+            },
+            {
+              size: {
+                kind: 'IntValue',
+                value: 1,
+              },
+            },
+          ],
+        },
+      },
     },
   };
   const output = {
-    'observed_Phenotype.parents:top_hits': {
-      top_hits: { _source: ['observed_Phenotype.parents'], size: 1 },
+    'observed_phenotype.name': {
+      terms: {
+        field: 'observed_phenotype.name',
+        size: 300000,
+      },
+      aggs: {
+        'observed_phenotype.name.hits': {
+          top_hits: {
+            _source: ['observed_phenotype.parents'],
+            size: 1,
+          },
+        },
+      },
+    },
+    'observed_phenotype.name:missing': {
+      missing: {
+        field: 'observed_phenotype.name',
+      },
     },
   };
   expect(createFieldAggregation(input)).toEqual(output);

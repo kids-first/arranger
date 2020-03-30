@@ -17,17 +17,6 @@ function flattenAggregations({ aggregations, includeMissing = true }) {
         ...prunedAggs,
         [field]: { ...prunedAggs[field], [aggregationType]: value.value },
       };
-    } else if (TOPHITS === aggregationType && Array.isArray(value.buckets)) {
-      return {
-        ...prunedAggs,
-        [field]: {
-          top_hits: value.buckets.map(b => ({
-            key: b.key,
-            doc_count: b.doc_count,
-            hits: b[`${field}.hits`]?.hits?.hits[0]?._source || {},
-          })),
-        },
-      };
     } else if (Array.isArray(value.buckets)) {
       const missing = get(aggregations, [`${field}:missing`]);
       const buckets = [
@@ -42,6 +31,7 @@ function flattenAggregations({ aggregations, includeMissing = true }) {
             .map(({ rn, ...bucket }) => ({
               ...bucket,
               doc_count: rn ? rn.doc_count : bucket.doc_count,
+              top_hits: bucket[`${field}.hits`]?.hits?.hits[0]?._source || {},
             }))
             .filter(b => b.doc_count),
         },
