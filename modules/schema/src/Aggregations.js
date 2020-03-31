@@ -11,6 +11,7 @@ export let typeDefs = `
     doc_count: Int
     key: String
     key_as_string: String
+    top_hits(_source:[String], size:Int): JSON
   }
 
   type NumericAggregations {

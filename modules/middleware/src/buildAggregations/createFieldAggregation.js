@@ -1,5 +1,6 @@
 import get from 'lodash/get';
-import { STATS, HISTOGRAM, BUCKETS, CARDINALITY } from '../constants';
+import { STATS, HISTOGRAM, BUCKETS, CARDINALITY, TOPHITS } from '../constants';
+import dialog from 'eslint-plugin-jsx-a11y/lib/util/implicitRoles/dialog';
 
 const MAX_AGGREGATION_SIZE = 300000;
 const HISTOGRAM_INTERVAL_DEFAULT = 1000;
@@ -22,11 +23,24 @@ const createNumericAggregation = ({ type, field, graphqlField }) => {
   };
 };
 
-const createTermAggregation = ({ field, isNested }) => {
+const createTermAggregation = ({ field, isNested, graphqlField }) => {
+  const topHits = graphqlField?.buckets?.top_hits || null;
+  const source = topHits?.__arguments[0]?._source || null;
+  const size = topHits?.__arguments[1]?.size || 1;
   return {
     [field]: {
       ...(isNested ? { aggs: { rn: { reverse_nested: {} } } } : {}),
       terms: { field, size: MAX_AGGREGATION_SIZE },
+      aggs: topHits
+        ? {
+            [`${field}.hits`]: {
+              top_hits: {
+                _source: [source?.value || ''],
+                size: size?.value,
+              },
+            },
+          }
+        : {},
     },
     [`${field}:missing`]: {
       ...(isNested ? { aggs: { rn: { reverse_nested: {} } } } : {}),
@@ -55,14 +69,14 @@ const computeCardinalityAggregation = ({ field, graphqlField }) => ({
  * graphqlFields: output from `graphql-fields` (https://github.com/robrichard/graphql-fields)
  */
 export default ({ field, graphqlField = {}, isNested = false }) => {
-  const types = [BUCKETS, STATS, HISTOGRAM, CARDINALITY].filter(
+  const types = [BUCKETS, STATS, HISTOGRAM, CARDINALITY, TOPHITS].filter(
     t => graphqlField[t],
   );
   return types.reduce((acc, type) => {
     if (type === BUCKETS) {
       return {
         ...acc,
-        ...createTermAggregation({ field, isNested }),
+        ...createTermAggregation({ field, isNested, graphqlField }),
       };
     } else if ([STATS, HISTOGRAM].includes(type)) {
       return {

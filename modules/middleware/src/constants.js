@@ -60,6 +60,7 @@ export const BUCKETS = 'buckets';
 export const STATS = 'stats';
 export const HISTOGRAM = 'histogram';
 export const CARDINALITY = 'cardinality';
+export const TOPHITS = 'top_hits';
 export const AGGS_WRAPPER_GLOBAL = 'global';
 export const AGGS_WRAPPER_FILTERED = 'filtered';
 export const AGGS_WRAPPER_NESTED = 'nested';
