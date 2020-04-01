@@ -1,6 +1,5 @@
 import get from 'lodash/get';
 import { STATS, HISTOGRAM, BUCKETS, CARDINALITY, TOPHITS } from '../constants';
-import dialog from 'eslint-plugin-jsx-a11y/lib/util/implicitRoles/dialog';
 
 const MAX_AGGREGATION_SIZE = 300000;
 const HISTOGRAM_INTERVAL_DEFAULT = 1000;
