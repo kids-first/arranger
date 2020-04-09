@@ -111,3 +111,60 @@ test('it should compute top hits aggregation', () => {
   };
   expect(createFieldAggregation(input)).toEqual(output);
 });
+
+test('it should compute top hits aggregation and revert nested', () => {
+  const input = {
+    field: 'observed_phenotype.name',
+    size: 1,
+    source: ['observed_Phenotype.parents'],
+    isNested: 1,
+    graphqlField: {
+      buckets: {
+        key: {},
+        doc_count: {},
+        top_hits: {
+          __arguments: [
+            {
+              _source: {
+                kind: 'StringValue',
+                value: 'observed_phenotype.parents',
+              },
+            },
+            {
+              size: {
+                kind: 'IntValue',
+                value: 1,
+              },
+            },
+          ],
+        },
+      },
+    },
+  };
+  const output = {
+    'observed_phenotype.name': {
+      terms: {
+        field: 'observed_phenotype.name',
+        size: 300000,
+      },
+      aggs: {
+        rn:{ reverse_nested:{}},
+        'observed_phenotype.name.hits': {
+          top_hits: {
+            _source: ['observed_phenotype.parents'],
+            size: 1,
+          },
+        },
+      },
+    },
+    'observed_phenotype.name:missing': {
+      missing: {
+        field: 'observed_phenotype.name',
+      },
+      aggs:{
+        rn:{ reverse_nested:{}}
+      }
+    },
+  };
+  expect(createFieldAggregation(input)).toEqual(output);
+});

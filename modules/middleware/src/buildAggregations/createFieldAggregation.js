@@ -26,20 +26,25 @@ const createTermAggregation = ({ field, isNested, graphqlField }) => {
   const topHits = graphqlField?.buckets?.top_hits || null;
   const source = topHits?.__arguments[0]?._source || null;
   const size = topHits?.__arguments[1]?.size || 1;
+  let innerAggs = {};
+  if (isNested) {
+    innerAggs = { ...innerAggs, rn: { reverse_nested: {} } };
+  }
+  if (topHits) {
+    innerAggs = {
+      ...innerAggs,
+      [`${field}.hits`]: {
+        top_hits: {
+          _source: [source?.value || ''],
+          size: size?.value,
+        },
+      },
+    };
+  }
   return {
     [field]: {
-      ...(isNested ? { aggs: { rn: { reverse_nested: {} } } } : {}),
+      aggs: {...innerAggs},
       terms: { field, size: MAX_AGGREGATION_SIZE },
-      aggs: topHits
-        ? {
-            [`${field}.hits`]: {
-              top_hits: {
-                _source: [source?.value || ''],
-                size: size?.value,
-              },
-            },
-          }
-        : {},
     },
     [`${field}:missing`]: {
       ...(isNested ? { aggs: { rn: { reverse_nested: {} } } } : {}),
