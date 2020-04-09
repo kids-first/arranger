@@ -1,5 +1,6 @@
 import get from 'lodash/get';
 import { STATS, HISTOGRAM, BUCKETS, CARDINALITY, TOPHITS } from '../constants';
+import isEmpty from 'lodash/isEmpty'
 
 const MAX_AGGREGATION_SIZE = 300000;
 const HISTOGRAM_INTERVAL_DEFAULT = 1000;
@@ -41,9 +42,10 @@ const createTermAggregation = ({ field, isNested, graphqlField }) => {
       },
     };
   }
+
   return {
     [field]: {
-      aggs: {...innerAggs},
+      ...(!isEmpty(innerAggs) ? { aggs: { ...innerAggs } } : {}),
       terms: { field, size: MAX_AGGREGATION_SIZE },
     },
     [`${field}:missing`]: {

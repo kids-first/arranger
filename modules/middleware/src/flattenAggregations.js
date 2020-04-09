@@ -1,5 +1,5 @@
 import get from 'lodash/get';
-import { HISTOGRAM, STATS, MISSING, CARDINALITY, TOPHITS } from './constants';
+import { HISTOGRAM, STATS, MISSING, CARDINALITY } from './constants';
 
 function flattenAggregations({ aggregations, includeMissing = true }) {
   return Object.entries(aggregations).reduce((prunedAggs, [key, value]) => {
@@ -31,7 +31,12 @@ function flattenAggregations({ aggregations, includeMissing = true }) {
             .map(({ rn, ...bucket }) => ({
               ...bucket,
               doc_count: rn ? rn.doc_count : bucket.doc_count,
-              top_hits: bucket[`${field}.hits`]?.hits?.hits[0]?._source || {},
+              ...(bucket[`${field}.hits`]
+                ? {
+                    top_hits:
+                      bucket[`${field}.hits`]?.hits?.hits[0]?._source || {},
+                  }
+                : {}),
             }))
             .filter(b => b.doc_count),
         },
