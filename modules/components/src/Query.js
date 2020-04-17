@@ -3,33 +3,20 @@ import isEqual from 'lodash/isEqual';
 import debounce from 'lodash/debounce';
 import path from 'path';
 import defaultApi from './utils/api';
-import { defaultProps } from 'recompose';
 
 class Query extends Component {
+  static defaultProps = {
+    shouldFetch: true,
+    forceFetch: false,
+  };
+
   state = { data: null, error: null, loading: this.props.shouldFetch };
 
-  componentDidMount() {
-    if (this.props.shouldFetch) {
-      this.fetch(this.props);
-    }
-  }
-  componentWillReceiveProps(next) {
-    if (
-      next.shouldFetch &&
-      (!this.props.shouldFetch ||
-        !isEqual(this.props.query, next.query) ||
-        !isEqual(this.props.variables, next.variables))
-    ) {
-      this.fetch(next);
-    }
-  }
-  componentDidCatch(error, info) {
-    this.setState({ error });
-  }
   fetch = debounce(
     async ({ projectId, query, variables, name, ...options }) => {
-      const { api = defaultApi } = this.props;
       this.setState({ loading: true });
+
+      const { api = defaultApi } = this.props;
       try {
         let { data, errors } = await api({
           ...options,
@@ -45,8 +32,35 @@ class Query extends Component {
         this.setState({ data: null, error: error.message, loading: false });
       }
     },
+
     this.props.debounceTime || 0,
   );
+
+  componentDidMount() {
+    if (this.props.shouldFetch) {
+      this.fetch(this.props);
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    //FIXME : it's pretty similar to 'shouldFetch' but using 'shouldFetch' would break the main condition...risky.
+    const isForceFetchRequested =
+      this.props.forceFetch && !prevProps.forceFetch;
+    if (
+      isForceFetchRequested ||
+      (this.props.shouldFetch &&
+        (!prevProps.shouldFetch ||
+          !isEqual(this.props.query, prevProps.query) ||
+          !isEqual(this.props.variables, prevProps.variables)))
+    ) {
+      this.fetch(this.props);
+    }
+  }
+
+  componentDidCatch(error, info) {
+    this.setState({ error });
+  }
+
   render() {
     const { loading, error, data } = this.state;
     const { render, renderError } = this.props;
@@ -57,17 +71,16 @@ class Query extends Component {
     );
   }
 }
-const EnhancedQuery = defaultProps({ shouldFetch: true })(Query);
 
 export const withQuery = getOptions => Component => props => {
   const options = getOptions(props);
 
   return (
-    <EnhancedQuery
+    <Query
       {...options}
       render={data => <Component {...props} {...{ [options.key]: data }} />}
     />
   );
 };
 
-export default EnhancedQuery;
+export default Query;
