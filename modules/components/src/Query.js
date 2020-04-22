@@ -7,7 +7,6 @@ import defaultApi from './utils/api';
 class Query extends Component {
   static defaultProps = {
     shouldFetch: true,
-    forceFetch: false,
   };
 
   state = { data: null, error: null, loading: this.props.shouldFetch };
@@ -43,15 +42,11 @@ class Query extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    //FIXME : it's pretty similar to 'shouldFetch' but using 'shouldFetch' would break the main condition...risky.
-    const isForceFetchRequested =
-      this.props.forceFetch && !prevProps.forceFetch;
     if (
-      isForceFetchRequested ||
-      (this.props.shouldFetch &&
-        (!prevProps.shouldFetch ||
-          !isEqual(this.props.query, prevProps.query) ||
-          !isEqual(this.props.variables, prevProps.variables)))
+      this.props.shouldFetch &&
+      (!prevProps.shouldFetch ||
+        !isEqual(this.props.query, prevProps.query) ||
+        !isEqual(this.props.variables, prevProps.variables))
     ) {
       this.fetch(this.props);
     }

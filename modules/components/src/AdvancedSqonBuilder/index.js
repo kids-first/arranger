@@ -18,12 +18,15 @@ import defaultApi from '../utils/api';
 import FaRegClone from 'react-icons/lib/fa/clone';
 import FaPlusCircle from 'react-icons/lib/fa/plus-circle';
 
-const hasOnlyOneEntry = sq => (sq?.content || []).length === 1;
-
 const newEmptySqon = () => ({
   op: AND_OP,
   content: [],
 });
+
+const generateSqonKey = sqon => {
+  const flattenValues = sqon.content.map(o => o.content.value).flat();
+  return flattenValues.join('-').replace(/\s/g, '');
+};
 
 class AdvancedSqonBuilder extends Component {
   static propTypes = {
@@ -329,16 +332,9 @@ class AdvancedSqonBuilder extends Component {
           </div>
           {syntheticSqons.map((sq, i) => (
             <SqonEntry
-              key={i}
+              key={`${i}-${generateSqonKey(sq)}`}
               index={i}
               api={api}
-              /*
-               * FIXME (hack):
-               *   when the first element in the query is chosen
-               *   with the ontology browser, participants count doesn't update.
-               *   So this, hack was added.
-               * */
-              forceFetch={hasOnlyOneEntry(sq)}
               arrangerProjectId={arrangerProjectId}
               arrangerProjectIndex={arrangerProjectIndex}
               syntheticSqon={sq}

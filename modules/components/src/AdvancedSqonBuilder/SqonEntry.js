@@ -146,19 +146,19 @@ export default class SqonEntry extends Component {
                 </div>
               </div>
             </div>
-            {
-              <div
-                className={`participantsCountContainer ${
-                  isActiveSqon || this.state.hoverring ? 'active' : ''
-                } ${loading ? 'loading' : ''}`}
-              >
-                <ResultCountIcon
-                  className="resultCountIcon"
-                  {...resultCountIconProps}
-                />
-                {get(data, 'participant.hits.total', loading ? '' : 0)}
-              </div>
-            }
+            <div
+              className={`participantsCountContainer ${
+                isActiveSqon || this.state.hoverring ? 'active' : ''
+              } ${loading ? 'loading' : ''}`}
+            >
+              <ResultCountIcon
+                className="resultCountIcon"
+                {...resultCountIconProps}
+              />
+              {loading
+                ? '...'
+                : get(data, 'participant.hits.total', 0)}
+            </div>
             <div className="actionButtonsContainer">
               <button
                 className={`sqonListActionButton`}
