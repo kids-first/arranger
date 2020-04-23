@@ -24,8 +24,11 @@ const newEmptySqon = () => ({
 });
 
 const generateSqonKey = sqon => {
-  const flattenValues = sqon.content.map(o => o.content.value).flat();
-  return flattenValues.join('-').replace(/\s/g, '');
+  const flattenValues = sqon.content.map(o => o.content?.value || null).flat();
+  return flattenValues
+    .filter(x => x)
+    .join('-')
+    .replace(/\s/g, '');
 };
 
 class AdvancedSqonBuilder extends Component {
