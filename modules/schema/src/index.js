@@ -26,6 +26,7 @@ export const setsMapping = {
   path: { type: 'keyword' },
   size: { type: 'long' },
   createdAt: { type: 'date' },
+  tag: { type: 'keyword' },
 };
 
 export default ({
