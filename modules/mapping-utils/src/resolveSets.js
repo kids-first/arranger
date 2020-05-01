@@ -1,6 +1,7 @@
 import { get, isEmpty, uniq } from 'lodash';
 import uuid from 'uuid/v4';
 import { CONSTANTS, buildQuery } from '@kfarranger/middleware';
+import { isTagValid } from './utils/sets';
 
 const retrieveSetIds = async ({
   es,
@@ -50,9 +51,12 @@ const retrieveSetIds = async ({
 
 export const saveSet = ({ types }) => async (
   obj,
-  { type, userId, sqon, path, sort, refresh = 'WAIT_FOR' },
-  { es, projectId },
+  { type, userId, sqon, path, sort, refresh = 'WAIT_FOR', tag },
+  { es },
 ) => {
+  if (!isTagValid(tag)) {
+    throw new Error('Invalid tag');
+  }
   const { nested_fields: nestedFields, es_type, index } = types.find(
     ([, x]) => x.name === type,
   )[1];
@@ -75,6 +79,7 @@ export const saveSet = ({ types }) => async (
     sqon,
     userId,
     size: ids.length,
+    tag,
   };
 
   await es.index({
