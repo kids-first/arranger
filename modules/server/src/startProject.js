@@ -21,7 +21,7 @@ import getTypes from './utils/getTypes';
 import replaceBy from './utils/replaceBy';
 
 const initializeSets = async ({ es }) => {
-  if (!await es.indices.exists({ index: CONSTANTS.ES_ARRANGER_SET_INDEX })) {
+  if (!(await es.indices.exists({ index: CONSTANTS.ES_ARRANGER_SET_INDEX }))) {
     await es.indices.create({
       index: CONSTANTS.ES_ARRANGER_SET_INDEX,
       body: {
@@ -50,6 +50,7 @@ export const createProjectEndpoint = async ({
   graphqlOptions = {},
   enableAdmin,
   typesWithMappings,
+  callbacks = {},
 }) => {
   if (!id) throw new Error('project empty');
 
@@ -64,12 +65,14 @@ export const createProjectEndpoint = async ({
     rootTypes: [],
     middleware: graphqlOptions.middleware || [],
     enableAdmin,
+    callbacks,
   });
 
   const mockSchema = makeSchema({
     types: typesWithMappings,
     rootTypes: [],
     mock: true,
+    callbacks,
   });
 
   await initializeSets({ es });
@@ -135,9 +138,10 @@ const initializeStates = async ({
 }) => {
   const createAggsState = typesWithMappings.map(async ([type, props]) => {
     const index = `${props.indexPrefix}-aggs-state`;
-    const count = await es
-      .count({ index, type: index })
-      .then(d => d.count, () => 0);
+    const count = await es.count({ index, type: index }).then(
+      d => d.count,
+      () => 0,
+    );
     return !(count > 0)
       ? [
           { index: { _index: index, _type: index, _id: uuid() } },
@@ -202,9 +206,10 @@ const initializeStates = async ({
 
   const createMatchBoxState = typesWithMappings.map(async ([type, props]) => {
     const index = `${props.indexPrefix}-matchbox-state`;
-    const count = await es
-      .count({ index, type: index })
-      .then(d => d.count, () => 0);
+    const count = await es.count({ index, type: index }).then(
+      d => d.count,
+      () => 0,
+    );
     return count === 0
       ? [
           { index: { _index: index, _type: index, _id: uuid() } },
@@ -241,6 +246,7 @@ export default async function startProjectApp({
   id,
   graphqlOptions = {},
   enableAdmin,
+  callbacks,
 }) {
   if (!id) throw new Error('project empty');
 
@@ -257,12 +263,14 @@ export default async function startProjectApp({
     hits.map(async type => {
       const indexPrefix = getIndexPrefix({ projectId: id, index: type.index });
       try {
-        const size = (await es.search({
-          index: indexPrefix,
-          type: indexPrefix,
-          size: 0,
-          _source: false,
-        })).hits.total;
+        const size = (
+          await es.search({
+            index: indexPrefix,
+            type: indexPrefix,
+            size: 0,
+            _source: false,
+          })
+        ).hits.total;
 
         const fields = extendFields(
           mapHits(
@@ -317,5 +325,6 @@ export default async function startProjectApp({
     graphqlOptions,
     enableAdmin,
     typesWithMappings,
+    callbacks,
   });
 }
