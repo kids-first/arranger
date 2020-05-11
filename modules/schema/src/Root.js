@@ -79,7 +79,7 @@ export let typeDefs = ({ types, rootTypes, scalarTypes, enableAdmin }) => [
 
 let resolveObject = () => ({});
 
-export let resolvers = ({ types, rootTypes, scalarTypes, enableAdmin }) => {
+export let resolvers = ({ types, rootTypes, scalarTypes, enableAdmin, callbacks }) => {
   return {
     JSON: GraphQLJSON,
     Date: GraphQLDate,
@@ -218,7 +218,7 @@ export let resolvers = ({ types, rootTypes, scalarTypes, enableAdmin }) => {
               },
             }
           : {})(),
-      saveSet: saveSet({ types }),
+      saveSet: saveSet({ types, callback: callbacks?.saveSet }),
     },
   };
 };

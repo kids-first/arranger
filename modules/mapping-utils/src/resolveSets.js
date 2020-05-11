@@ -1,4 +1,4 @@
-import { get, isEmpty, uniq } from 'lodash';
+import { get, isEmpty, uniq, isFunction } from 'lodash';
 import uuid from 'uuid/v4';
 import { CONSTANTS, buildQuery } from '@kfarranger/middleware';
 import { isTagValid } from './utils/sets';
@@ -49,18 +49,24 @@ const retrieveSetIds = async ({
   return handleResult(await search());
 };
 
-export const saveSet = ({ types }) => async (
+export const saveSet = ({ types, callback }) => async (
   obj,
   { type, userId, sqon, path, sort, refresh = 'WAIT_FOR', tag },
   { es },
 ) => {
-  if (!isTagValid(tag)) {
-    throw new Error('Invalid tag');
+  if (tag) {
+    // if a tag is present, test early.
+    if (!isTagValid(tag)) {
+      throw new Error('Invalid tag, no set created.');
+    } else if (!isFunction(callback)) {
+      throw new Error('Cannot process further, no set created.');
+    }
   }
   const { nested_fields: nestedFields, es_type, index } = types.find(
     ([, x]) => x.name === type,
   )[1];
   const query = buildQuery({ nestedFields, filters: sqon || {} });
+
   const ids = await retrieveSetIds({
     es,
     index: index,
@@ -90,5 +96,8 @@ export const saveSet = ({ types }) => async (
     body,
   });
 
+  if (tag) {
+    await callback(body);
+  }
   return body;
 };

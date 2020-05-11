@@ -13,9 +13,16 @@ let startSingleProject = async ({
   es,
   graphqlOptions,
   enableAdmin,
+  callbacks,
 }) => {
   try {
-    await startProject({ es, id: projectId, graphqlOptions, enableAdmin });
+    await startProject({
+      es,
+      id: projectId,
+      graphqlOptions,
+      enableAdmin,
+      callbacks,
+    });
   } catch (error) {
     console.warn(error.message);
   }
@@ -27,6 +34,7 @@ export default async ({
   esHost = ES_HOST,
   graphqlOptions = {},
   enableAdmin = false,
+  callbacks = {},
 } = {}) => {
   if (!esHost) {
     console.error('no elasticsearch host was provided');
@@ -34,10 +42,15 @@ export default async ({
   enableAdmin
     ? console.log('Application started in ADMIN mode!!')
     : console.log('Application started in read-only mode.');
-
   const es = new elasticsearch.Client({ host: esHost });
   if (projectId) {
-    startSingleProject({ projectId, es, graphqlOptions, enableAdmin });
+    startSingleProject({
+      projectId,
+      es,
+      graphqlOptions,
+      enableAdmin,
+      callbacks,
+    });
   } else {
     const { projects = [] } = await fetchProjects({ es });
     await Promise.all(
@@ -51,6 +64,7 @@ export default async ({
               es,
               graphqlOptions,
               enableAdmin,
+              callbacks,
             });
           } catch (error) {
             console.warn(error.message);
@@ -92,6 +106,7 @@ export default async ({
           enableAdmin,
           graphqlOptions,
           projectId,
+          callbacks,
         });
         const project = getProjects().find(
           p => p.id.toLowerCase() === req.params.projectId.toLowerCase(),
