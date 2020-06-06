@@ -1,6 +1,7 @@
 import get from 'lodash/get';
 import { STATS, HISTOGRAM, BUCKETS, CARDINALITY, TOPHITS } from '../constants';
-import isEmpty from 'lodash/isEmpty'
+import isEmpty from 'lodash/isEmpty';
+import getTermFilter from '../buildQuery/index';
 
 const MAX_AGGREGATION_SIZE = 300000;
 const HISTOGRAM_INTERVAL_DEFAULT = 1000;
@@ -25,8 +26,9 @@ const createNumericAggregation = ({ type, field, graphqlField }) => {
 
 const createTermAggregation = ({ field, isNested, graphqlField }) => {
   const topHits = graphqlField?.buckets?.top_hits || null;
+  const termFilter = graphqlField?.buckets?.filter_by_term || null;
   const source = topHits?.__arguments[0]?._source || null;
-  const size = topHits?.__arguments[1]?.size || 1;
+  const size = topHits?.__arguments[2]?.size || 1;
   let innerAggs = {};
   if (isNested) {
     innerAggs = { ...innerAggs, rn: { reverse_nested: {} } };
@@ -36,11 +38,29 @@ const createTermAggregation = ({ field, isNested, graphqlField }) => {
       ...innerAggs,
       [`${field}.hits`]: {
         top_hits: {
-          _source: [source?.value || ''],
+          _source: source?.value || [],
           size: size?.value,
         },
       },
     };
+  }
+
+  if (termFilter) {
+    const toto = termFilter.__arguments[0].filter.value;
+    const {
+      op,
+      content: { value, field },
+    } = toto;
+    // innerAggs = {
+    //   ...innerAggs,
+    //   [`${field}.term_filter`]: {
+    //     filter: {
+    //       term: {
+    //         tt: sourceNew?.filter(s => s).map(s => s.value) || [],
+    //       },
+    //     },
+    //   },
+    // };
   }
 
   return {
