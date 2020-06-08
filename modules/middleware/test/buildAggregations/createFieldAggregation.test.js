@@ -171,8 +171,11 @@ test('it should compute top hits aggregation and revert nested', () => {
 
 test('it should compute top hits aggregation and filter by term aggregation', () => {
   const qVariable = {
-    op: 'and',
-    content: { field: 'diagnoses.mondo.is_tagged', value: false },
+    kind: 'Variable',
+    value: [
+      { field: 'diagnoses.mondo.is_tagged', value: false },
+      { field: 'other_term', value: 'some_value' },
+    ],
   };
 
   const input = {
@@ -205,10 +208,7 @@ test('it should compute top hits aggregation and filter by term aggregation', ()
         filter_by_term: {
           __arguments: [
             {
-              filter: {
-                kind: 'ObjectValue',
-                value: qVariable,
-              },
+              filter: qVariable,
             },
           ],
         },
@@ -222,11 +222,6 @@ test('it should compute top hits aggregation and filter by term aggregation', ()
         size: 300000,
       },
       aggs: {
-        'diagnoses.mondo.is_tagged.term_filter': {
-          filter: {
-            term: { 'diagnoses.mondo.is_tagged': false },
-          },
-        },
         'observed_phenotype.name.hits': {
           top_hits: {
             _source: [
@@ -234,6 +229,16 @@ test('it should compute top hits aggregation and filter by term aggregation', ()
               'observed_phenotype.is_tagged',
             ],
             size: 1,
+          },
+        },
+        'diagnoses.mondo.is_tagged.term_filter': {
+          filter: {
+            term: { 'diagnoses.mondo.is_tagged': false },
+          },
+        },
+        'other_term.term_filter': {
+          filter: {
+            term: { other_term: 'some_value' },
           },
         },
       },

@@ -1,7 +1,6 @@
 import get from 'lodash/get';
 import { STATS, HISTOGRAM, BUCKETS, CARDINALITY, TOPHITS } from '../constants';
 import isEmpty from 'lodash/isEmpty';
-import getTermFilter from '../buildQuery/index';
 
 const MAX_AGGREGATION_SIZE = 300000;
 const HISTOGRAM_INTERVAL_DEFAULT = 1000;
@@ -46,19 +45,21 @@ const createTermAggregation = ({ field, isNested, graphqlField }) => {
   }
 
   if (termFilter) {
-    const {
-      op,
-      content: { value, field },
-    } = termFilter.__arguments[0].filter.value;
+    const terms = termFilter.__arguments[0]?.filter?.value || [];
+
     innerAggs = {
       ...innerAggs,
-      [`${field}.term_filter`]: {
-        filter: {
-          term: {
-            [field]: value,
-          },
-        },
-      },
+      ...(terms[0]
+        ? terms.reduce(
+            (ac, a) => ({
+              ...ac,
+              [`${a.field}.term_filter`]: {
+                filter: { term: { [a.field]: a.value } },
+              },
+            }),
+            {},
+          )
+        : {}),
     };
   }
 
