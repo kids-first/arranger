@@ -73,8 +73,8 @@ test('it should compute top hits aggregation', () => {
           __arguments: [
             {
               _source: {
-                kind: 'StringValue',
-                value: 'observed_phenotype.parents',
+                kind: 'ListValue',
+                value: ['observed_phenotype.parents'],
               },
             },
             {
@@ -126,8 +126,8 @@ test('it should compute top hits aggregation and revert nested', () => {
           __arguments: [
             {
               _source: {
-                kind: 'StringValue',
-                value: 'observed_phenotype.parents',
+                kind: 'ListValue',
+                value: ['observed_phenotype.parents'],
               },
             },
             {
@@ -148,7 +148,7 @@ test('it should compute top hits aggregation and revert nested', () => {
         size: 300000,
       },
       aggs: {
-        rn:{ reverse_nested:{}},
+        rn: { reverse_nested: {} },
         'observed_phenotype.name.hits': {
           top_hits: {
             _source: ['observed_phenotype.parents'],
@@ -161,9 +161,87 @@ test('it should compute top hits aggregation and revert nested', () => {
       missing: {
         field: 'observed_phenotype.name',
       },
-      aggs:{
-        rn:{ reverse_nested:{}}
-      }
+      aggs: {
+        rn: { reverse_nested: {} },
+      },
+    },
+  };
+  expect(createFieldAggregation(input)).toEqual(output);
+});
+
+test('it should compute top hits aggregation and filter by term aggregation', () => {
+  const qVariable = {
+    op: 'and',
+    content: { field: 'diagnoses.mondo.is_tagged', value: false },
+  };
+
+  const input = {
+    field: 'observed_phenotype.name',
+    size: 1,
+    source: ['observed_Phenotype.parents'],
+    graphqlField: {
+      buckets: {
+        key: {},
+        doc_count: {},
+        top_hits: {
+          __arguments: [
+            {
+              _source: {
+                kind: 'ListValue',
+                value: [
+                  'observed_phenotype.parents',
+                  'observed_phenotype.is_tagged',
+                ],
+              },
+            },
+            {
+              size: {
+                kind: 'IntValue',
+                value: 1,
+              },
+            },
+          ],
+        },
+        filter_by_term: {
+          __arguments: [
+            {
+              filter: {
+                kind: 'ObjectValue',
+                value: qVariable,
+              },
+            },
+          ],
+        },
+      },
+    },
+  };
+  const output = {
+    'observed_phenotype.name': {
+      terms: {
+        field: 'observed_phenotype.name',
+        size: 300000,
+      },
+      aggs: {
+        'diagnoses.mondo.is_tagged.term_filter': {
+          filter: {
+            term: { 'diagnoses.mondo.is_tagged': false },
+          },
+        },
+        'observed_phenotype.name.hits': {
+          top_hits: {
+            _source: [
+              'observed_phenotype.parents',
+              'observed_phenotype.is_tagged',
+            ],
+            size: 1,
+          },
+        },
+      },
+    },
+    'observed_phenotype.name:missing': {
+      missing: {
+        field: 'observed_phenotype.name',
+      },
     },
   };
   expect(createFieldAggregation(input)).toEqual(output);
