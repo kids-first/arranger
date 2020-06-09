@@ -23,6 +23,10 @@ function flattenAggregations({ aggregations, includeMissing = true }) {
         ...value.buckets,
         ...(includeMissing && missing ? [{ ...missing, key: MISSING }] : []),
       ];
+
+      const filterFields =
+        buckets.length > 0 ? termFilterFields(buckets[0]) : [];
+
       return {
         ...prunedAggs,
         [field]: {
@@ -37,6 +41,14 @@ function flattenAggregations({ aggregations, includeMissing = true }) {
                       bucket[`${field}.hits`]?.hits?.hits[0]?._source || {},
                   }
                 : {}),
+              ...(filterFields[0]
+                ? {
+                    filter_by_term: filterFields.reduce(
+                      (ac, a) => ({ ...ac, [a]: bucket[a] }),
+                      {},
+                    ),
+                  }
+                : {}),
             }))
             .filter(b => b.doc_count),
         },
@@ -49,5 +61,9 @@ function flattenAggregations({ aggregations, includeMissing = true }) {
     }
   }, {});
 }
+const regex = RegExp('([a-zA-Z0-9._]*).term_filter$');
+
+const termFilterFields = values =>
+  Object.keys(values).filter(s => regex.test(s));
 
 export default flattenAggregations;

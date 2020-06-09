@@ -202,7 +202,6 @@ test('buildQuery "all" ops', () => {
   ];
   tests.forEach(({ input, output }) => {
     const actualOutput = buildQuery(input);
-    console.log('actualOutput: ', JSON.stringify(actualOutput));
     expect(actualOutput).toEqual(output);
   });
 });

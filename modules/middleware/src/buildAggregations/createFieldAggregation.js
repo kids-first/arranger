@@ -1,6 +1,6 @@
 import get from 'lodash/get';
 import { STATS, HISTOGRAM, BUCKETS, CARDINALITY, TOPHITS } from '../constants';
-import isEmpty from 'lodash/isEmpty'
+import isEmpty from 'lodash/isEmpty';
 
 const MAX_AGGREGATION_SIZE = 300000;
 const HISTOGRAM_INTERVAL_DEFAULT = 1000;
@@ -25,6 +25,7 @@ const createNumericAggregation = ({ type, field, graphqlField }) => {
 
 const createTermAggregation = ({ field, isNested, graphqlField }) => {
   const topHits = graphqlField?.buckets?.top_hits || null;
+  const termFilter = graphqlField?.buckets?.filter_by_term || null;
   const source = topHits?.__arguments[0]?._source || null;
   const size = topHits?.__arguments[1]?.size || 1;
   let innerAggs = {};
@@ -36,10 +37,29 @@ const createTermAggregation = ({ field, isNested, graphqlField }) => {
       ...innerAggs,
       [`${field}.hits`]: {
         top_hits: {
-          _source: [source?.value || ''],
+          _source: source?.value || [],
           size: size?.value,
         },
       },
+    };
+  }
+
+  if (termFilter) {
+    const terms = termFilter.__arguments[0]?.filter?.value || [];
+
+    innerAggs = {
+      ...innerAggs,
+      ...(terms[0]
+        ? terms.reduce(
+            (ac, a) => ({
+              ...ac,
+              [`${a.field}.term_filter`]: {
+                filter: { term: { [a.field]: a.value } },
+              },
+            }),
+            {},
+          )
+        : {}),
     };
   }
 
