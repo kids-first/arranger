@@ -61,11 +61,9 @@ function flattenAggregations({ aggregations, includeMissing = true }) {
     }
   }, {});
 }
+const regex = RegExp('([a-zA-Z0-9._]*).term_filter$');
 
-const termFilterFields = values => {
-  const regex = RegExp('([a-zA-Z0-9._]*).term_filter$');
-
-  return Object.keys(values).filter(s => regex.test(s));
-};
+const termFilterFields = values =>
+  Object.keys(values).filter(s => regex.test(s));
 
 export default flattenAggregations;
