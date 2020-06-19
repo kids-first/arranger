@@ -223,10 +223,10 @@ const TermAgg = ({
                     showingBuckets: array,
                     showingMore,
                   }) || ''}`}
-                  content={{
+                  content={JSON.stringify({
                     field: dotField,
                     value: bucket.name,
-                  }}
+                  })}
                   onClick={() =>
                     handleValueClick({
                       field: dotField,
