@@ -9,6 +9,7 @@ import {
   isIndexReferencedInSqon,
   getDependentIndices,
   DisplayNameMapContext,
+  ActionContext,
   isEmptySqon,
   AND_OP,
   OR_OP,
@@ -47,6 +48,7 @@ class AdvancedSqonBuilder extends Component {
     api: PropTypes.func,
     referenceColors: PropTypes.arrayOf(PropTypes.string),
     emptyEntryMessage: PropTypes.node,
+    actionsProvider: PropTypes.object,
   };
 
   static defaultProps = {
@@ -71,6 +73,7 @@ class AdvancedSqonBuilder extends Component {
     emptyEntryMessage: null,
     ResultCountIcon: () => null,
     resultCountIconProps: {},
+    actionsProvider: {},
   };
 
   state = {
@@ -283,6 +286,7 @@ class AdvancedSqonBuilder extends Component {
       emptyEntryMessage,
       ResultCountIcon,
       resultCountIconProps,
+      actionsProvider,
     } = this.props;
 
     const selectedSyntheticSqon = syntheticSqons[currentActiveSqonIndex];
@@ -306,105 +310,111 @@ class AdvancedSqonBuilder extends Component {
 
     return (
       <DisplayNameMapContext.Provider value={fieldDisplayNameMap}>
-        <div className={`sqonBuilder`}>
-          <div className={`actionHeaderContainer`}>
-            <div>
-              <span>Combine Queries: </span>
-              <span>
-                <ButtonComponent
-                  className={`and`}
-                  disabled={!this.state.selectedSqonIndices.length}
-                  onClick={this.createIntersectSqon}
-                >
-                  and
+        <ActionContext.Provider value={actionsProvider}>
+          <div className={`sqonBuilder`}>
+            <div className={`actionHeaderContainer`}>
+              <div>
+                <span>Combine Queries: </span>
+                <span>
+                  <ButtonComponent
+                    className={`and`}
+                    disabled={!this.state.selectedSqonIndices.length}
+                    onClick={this.createIntersectSqon}
+                  >
+                    and
+                  </ButtonComponent>
+                  <ButtonComponent
+                    className={`or`}
+                    disabled={!this.state.selectedSqonIndices.length}
+                    onClick={this.createUnionSqon}
+                  >
+                    or
+                  </ButtonComponent>
+                </span>
+              </div>
+              <div>
+                <ButtonComponent onClick={this.onClearAllClick}>
+                  CLEAR ALL
                 </ButtonComponent>
-                <ButtonComponent
-                  className={`or`}
-                  disabled={!this.state.selectedSqonIndices.length}
-                  onClick={this.createUnionSqon}
-                >
-                  or
-                </ButtonComponent>
-              </span>
+              </div>
             </div>
-            <div>
-              <ButtonComponent onClick={this.onClearAllClick}>
-                CLEAR ALL
-              </ButtonComponent>
-            </div>
-          </div>
-          {syntheticSqons.map((sq, i) => (
-            <SqonEntry
-              key={`${i}-${generateSqonKey(sq)}`}
-              index={i}
-              api={api}
-              arrangerProjectId={arrangerProjectId}
-              arrangerProjectIndex={arrangerProjectIndex}
-              syntheticSqon={sq}
-              isActiveSqon={i === currentActiveSqonIndex}
-              isSelected={this.state.selectedSqonIndices.includes(i)}
-              isReferenced={isSqonReferenced(i)}
-              isIndexReferenced={isIndexReferencedInSqon(selectedSyntheticSqon)}
-              isDeleting={this.state.deletingIndex === i}
-              disabled={isEmptySqon(sq)}
-              SqonActionComponent={SqonActionComponent}
-              FieldOpModifierContainer={FieldOpModifierContainer}
-              getActiveExecutableSqon={getActiveExecutableSqon}
-              getColorForReference={getColorForReference}
-              dependentIndices={getDependentIndices(syntheticSqons)(i)}
-              onSqonChange={this.onSqonChange(i)}
-              onSqonCheckedChange={this.onSelectedSqonIndicesChange(i)}
-              onSqonDuplicate={this.onSqonDuplicate(i)}
-              onSqonRemove={this.onSqonRemove(i)}
-              onActivate={onSqonEntryActivate(i)}
-              onDeleteConfirmed={this.state.onSqonDeleteConfirmed || (() => {})}
-              onDeleteCanceled={this.state.onSqonDeleteCancel || (() => {})}
-              emptyEntryMessage={emptyEntryMessage}
-              syntheticSqons={syntheticSqons}
-              ResultCountIcon={ResultCountIcon}
-              resultCountIconProps={resultCountIconProps}
-            />
-          ))}
-          <div>
-            <button
-              className={`sqonListActionButton removeButton`}
-              disabled={!allowsNewSqon}
-              onClick={() => {
-                if (allowsNewSqon) {
-                  this.dispatchSqonListChange()({
-                    eventKey: 'NEW_SQON',
-                    eventDetails: {},
-                    newSqonList: [...syntheticSqons, newEmptySqon()],
-                  })
-                    .then(() =>
-                      onActiveSqonSelect({ index: syntheticSqons.length }),
-                    )
-                    .then(() => {
-                      this.setState({
-                        selectedSqonIndices: [],
-                      });
-                      this.clearSqonDeletion();
-                    });
+            {syntheticSqons.map((sq, i) => (
+              <SqonEntry
+                key={`${i}-${generateSqonKey(sq)}`}
+                index={i}
+                api={api}
+                arrangerProjectId={arrangerProjectId}
+                arrangerProjectIndex={arrangerProjectIndex}
+                syntheticSqon={sq}
+                isActiveSqon={i === currentActiveSqonIndex}
+                isSelected={this.state.selectedSqonIndices.includes(i)}
+                isReferenced={isSqonReferenced(i)}
+                isIndexReferenced={isIndexReferencedInSqon(
+                  selectedSyntheticSqon,
+                )}
+                isDeleting={this.state.deletingIndex === i}
+                disabled={isEmptySqon(sq)}
+                SqonActionComponent={SqonActionComponent}
+                FieldOpModifierContainer={FieldOpModifierContainer}
+                getActiveExecutableSqon={getActiveExecutableSqon}
+                getColorForReference={getColorForReference}
+                dependentIndices={getDependentIndices(syntheticSqons)(i)}
+                onSqonChange={this.onSqonChange(i)}
+                onSqonCheckedChange={this.onSelectedSqonIndicesChange(i)}
+                onSqonDuplicate={this.onSqonDuplicate(i)}
+                onSqonRemove={this.onSqonRemove(i)}
+                onActivate={onSqonEntryActivate(i)}
+                onDeleteConfirmed={
+                  this.state.onSqonDeleteConfirmed || (() => {})
                 }
-              }}
-            >
-              <FaPlusCircle />
-              {` `}Start new query
-            </button>
-            <button
-              className={`sqonListActionButton duplicateButton`}
-              disabled={
-                selectedSyntheticSqon
-                  ? !selectedSyntheticSqon.content.length
-                  : false
-              }
-              onClick={this.onSqonDuplicate(currentActiveSqonIndex)}
-            >
-              <FaRegClone />
-              {` `}Duplicate Query
-            </button>
+                onDeleteCanceled={this.state.onSqonDeleteCancel || (() => {})}
+                emptyEntryMessage={emptyEntryMessage}
+                syntheticSqons={syntheticSqons}
+                ResultCountIcon={ResultCountIcon}
+                resultCountIconProps={resultCountIconProps}
+              />
+            ))}
+            <div>
+              <button
+                className={`sqonListActionButton removeButton`}
+                disabled={!allowsNewSqon}
+                onClick={() => {
+                  if (allowsNewSqon) {
+                    this.dispatchSqonListChange()({
+                      eventKey: 'NEW_SQON',
+                      eventDetails: {},
+                      newSqonList: [...syntheticSqons, newEmptySqon()],
+                    })
+                      .then(() =>
+                        onActiveSqonSelect({ index: syntheticSqons.length }),
+                      )
+                      .then(() => {
+                        this.setState({
+                          selectedSqonIndices: [],
+                        });
+                        this.clearSqonDeletion();
+                      });
+                  }
+                }}
+              >
+                <FaPlusCircle />
+                {` `}Start new query
+              </button>
+              <button
+                className={`sqonListActionButton duplicateButton`}
+                disabled={
+                  selectedSyntheticSqon
+                    ? !selectedSyntheticSqon.content.length
+                    : false
+                }
+                onClick={this.onSqonDuplicate(currentActiveSqonIndex)}
+              >
+                <FaRegClone />
+                {` `}Duplicate Query
+              </button>
+            </div>
           </div>
-        </div>
+        </ActionContext.Provider>
       </DisplayNameMapContext.Provider>
     );
   }

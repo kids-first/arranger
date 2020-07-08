@@ -10,6 +10,7 @@ import {
   TERM_OPS,
   IN_OP,
   AND_OP,
+  ActionContext,
 } from '../utils';
 import TermAgg from '../../Aggs/TermAgg';
 import TextFilter from '../../TextFilter';
@@ -167,9 +168,8 @@ export class TermFilterUI extends React.Component {
 
     const computedBuckets = this.computeBuckets(buckets);
     const noResults = computedBuckets.length === 0;
-    const fieldDisplayName =
-      fieldDisplayNameMap[this.generateInitialFieldSqon().content.field] ||
-      this.generateInitialFieldSqon().content.field;
+    const field = this.generateInitialFieldSqon().content.field;
+    const fieldDisplayName = fieldDisplayNameMap[field] || field;
 
     if (noResults) {
       return (
@@ -205,18 +205,29 @@ export class TermFilterUI extends React.Component {
           />
         </div>
         <div className="contentSection termFilterActionContainer">
-          <span
-            className={`aggsFilterAction selectAll`}
-            onClick={this.onSelectAllClick}
-          >
-            Select All
-          </span>
-          <span
-            className={`aggsFilterAction clear`}
-            onClick={this.onClearClick}
-          >
-            Clear
-          </span>
+          <div className="actionsContainer left">
+            <span
+              className={`aggsFilterAction selectAll`}
+              onClick={this.onSelectAllClick}
+            >
+              Select All
+            </span>
+            <span
+              className={`aggsFilterAction clear`}
+              onClick={this.onClearClick}
+            >
+              Clear
+            </span>
+          </div>
+          <div className="actionsContainer right">
+            <ActionContext.Consumer>
+              {actions => {
+                if (actions.TermFilter?.extraFilterActions?.isVisible(field)) {
+                  return actions.TermFilter.extraFilterActions.component;
+                }
+              }}
+            </ActionContext.Consumer>
+          </div>
         </div>
         <div className="contentSection termAggContainer">
           <TermAgg
