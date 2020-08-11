@@ -125,8 +125,8 @@ export const duplicateSqonAtIndex = (indexToDuplicate, sqonList) => {
       ? sqon
       : {
           ...sqon,
-          content: sqon.content.map(
-            s => (!isNaN(s) ? (s > indexToDuplicate ? s + 1 : s) : s),
+          content: sqon.content.map(s =>
+            !isNaN(s) ? (s > indexToDuplicate ? s + 1 : s) : s,
           ),
         };
   });
@@ -208,3 +208,30 @@ export const setSqonAtPath = (paths, newSqon) => sqon => {
 };
 
 export const DisplayNameMapContext = React.createContext({});
+
+/* Enable custom action to be pass to different arrange components
+
+type Actions {
+  isVisible: function || boolean;
+  component: React.Component;
+}
+
+interface SectionComponentActions {
+  [key: string]: Actions[]
+}
+
+interface ActionsProvider {
+  [key: string] : SectionComponentActions
+}
+
+use: <ActionContext.Provider value={{Termfiler: extraFilterActions: {isVisible: ()=>{}, component: <> }}}
+
+*/
+
+export const ActionContext = React.createContext({
+  TermFilter: {
+    extraFilterActions: {
+      isVisible: () => false,
+    },
+  },
+});

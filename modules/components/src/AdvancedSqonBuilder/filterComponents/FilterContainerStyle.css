@@ -50,8 +50,12 @@
   text-decoration: underline;
   cursor: pointer;
 }
-.filterContainer .aggsFilterAction.selectAll {
-  margin-right: 5px;
+.filterContainer .termFilterActionContainer .actionsContainer .aggsFilterAction:not(:first-child) {
+  margin-left: 5px;
+}
+
+.filterContainer .termFilterActionContainer .actionsContainer left {
+  flex-grow: 1; 
 }
 
 /* for the range filter */
@@ -92,4 +96,9 @@
 .filterContainer .rangeFilterInput:disabled {
   background: #f4f5f8;
   color: #a9adc0;
+}
+
+.filterContainer .contentSection.termFilterActionContainer {
+  display: flex;
+  justify-content: space-between;
 }
