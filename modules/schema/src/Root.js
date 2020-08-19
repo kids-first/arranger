@@ -7,6 +7,7 @@ import Parallel from 'paralleljs';
 import {
   createConnectionResolvers,
   saveSet,
+  deleteSaveSets,
   mappingToFields,
 } from '@kfarranger/mapping-utils';
 
@@ -15,7 +16,6 @@ import { typeDefs as SetTypeDefs } from './Sets';
 import { typeDefs as SortTypeDefs } from './Sort';
 import { typeDefs as DeleteSets } from './DeleteSets';
 import { typeDefs as StateTypeDefs } from './State';
-import { deleteSaveSets } from '@kfarranger/mapping-utils/src/resolveSets';
 
 let RootTypeDefs = ({ types, rootTypes, scalarTypes, enableAdmin }) => `
   scalar JSON
