@@ -101,3 +101,27 @@ export const saveSet = ({ types, callback }) => async (
   }
   return body;
 };
+
+export const deleteSaveSets = ({ callback }) => async (
+  obj,
+  { setIds, userId },
+  { es },
+) => {
+  const esResponse = await es.deleteByQuery({
+    index: CONSTANTS.ES_ARRANGER_SET_INDEX,
+    type: CONSTANTS.ES_ARRANGER_SET_TYPE,
+    body: {
+      query: {
+        terms: {
+          setId: setIds,
+        },
+      },
+    },
+  });
+
+  if (isFunction(callback)) {
+    await callback({ userId: userId, setIds: setIds, toDelete: true });
+  }
+
+  return esResponse.deleted;
+};
