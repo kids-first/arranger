@@ -13,7 +13,9 @@ import {
 import { typeDefs as AggregationsTypeDefs } from './Aggregations';
 import { typeDefs as SetTypeDefs } from './Sets';
 import { typeDefs as SortTypeDefs } from './Sort';
+import { typeDefs as DeleteSets } from './DeleteSets';
 import { typeDefs as StateTypeDefs } from './State';
+import { deleteSaveSets } from '@kfarranger/mapping-utils/src/resolveSets';
 
 let RootTypeDefs = ({ types, rootTypes, scalarTypes, enableAdmin }) => `
   scalar JSON
@@ -56,9 +58,11 @@ let RootTypeDefs = ({ types, rootTypes, scalarTypes, enableAdmin }) => `
         ? `saveAggsState(graphqlField: String! state: JSON!): AggsState
     saveColumnsState(graphqlField: String! state: JSON!): ColumnsState
     saveMatchBoxState(graphqlField: String! state: JSON!): MatchBoxState
-    saveSet(type: String! userId: String sqon: JSON! path: String! sort: [Sort] refresh: EsRefresh tag: String): Set`
+    saveSet(type: String! userId: String sqon: JSON! path: String! sort: [Sort] refresh: EsRefresh tag: String): Set
+    deleteSaveSets(setIds: [String!] userId: String!): Int`
         : `
-    saveSet(type: String! userId: String sqon: JSON! path: String! sort: [Sort] refresh: EsRefresh tag: String): Set`
+    saveSet(type: String! userId: String sqon: JSON! path: String! sort: [Sort] refresh: EsRefresh tag: String): Set
+    deleteSaveSets(setIds: [String!] userId: String!): Int`
     }
   }
 
@@ -74,12 +78,19 @@ export let typeDefs = ({ types, rootTypes, scalarTypes, enableAdmin }) => [
   SetTypeDefs,
   SortTypeDefs,
   StateTypeDefs,
+  DeleteSets,
   ...types.map(([key, type]) => mappingToFields({ key, type, parent: '' })),
 ];
 
 let resolveObject = () => ({});
 
-export let resolvers = ({ types, rootTypes, scalarTypes, enableAdmin, callbacks }) => {
+export let resolvers = ({
+  types,
+  rootTypes,
+  scalarTypes,
+  enableAdmin,
+  callbacks,
+}) => {
   return {
     JSON: GraphQLJSON,
     Date: GraphQLDate,
@@ -219,6 +230,7 @@ export let resolvers = ({ types, rootTypes, scalarTypes, enableAdmin, callbacks 
             }
           : {})(),
       saveSet: saveSet({ types, callback: callbacks?.saveSet }),
+      deleteSaveSets: deleteSaveSets({ callback: callbacks?.saveSet }),
     },
   };
 };
