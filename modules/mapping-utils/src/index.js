@@ -1,8 +1,11 @@
 export { default as addMappingsToTypes } from './addMappingsToTypes';
+export { default as createConnectionResolvers } from './createConnectionResolvers';
 export {
-  default as createConnectionResolvers,
-} from './createConnectionResolvers';
-export { default as resolveSets, saveSet, deleteSaveSets } from './resolveSets';
+  default as resolveSets,
+  saveSet,
+  deleteSaveSets,
+  updateSaveSet,
+} from './resolveSets';
 export { default as mappingToFields } from './mappingToFields';
 export { default as mappingToAggsType } from './mappingToAggsType';
 export { default as mappingToAggsState } from './mappingToAggsState';
@@ -20,6 +23,4 @@ export { default as mapHits } from './utils/mapHits';
 export { default as getNestedFields } from './getNestedFields';
 export { default as flattenMapping } from './flattenMapping';
 export { default as extendMapping, extendFields } from './extendMapping';
-export {
-  default as mappingToDisplayTreeData,
-} from './mappingToDisplayTreeData';
+export { default as mappingToDisplayTreeData } from './mappingToDisplayTreeData';

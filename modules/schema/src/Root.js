@@ -9,12 +9,14 @@ import {
   saveSet,
   deleteSaveSets,
   mappingToFields,
+  updateSaveSet,
 } from '@kfarranger/mapping-utils';
 
 import { typeDefs as AggregationsTypeDefs } from './Aggregations';
 import { typeDefs as SetTypeDefs } from './Sets';
 import { typeDefs as SortTypeDefs } from './Sort';
 import { typeDefs as DeleteSets } from './DeleteSets';
+import { typeDefs as EditSets } from './DeleteSets';
 import { typeDefs as StateTypeDefs } from './State';
 
 let RootTypeDefs = ({ types, rootTypes, scalarTypes, enableAdmin }) => `
@@ -59,10 +61,14 @@ let RootTypeDefs = ({ types, rootTypes, scalarTypes, enableAdmin }) => `
     saveColumnsState(graphqlField: String! state: JSON!): ColumnsState
     saveMatchBoxState(graphqlField: String! state: JSON!): MatchBoxState
     saveSet(type: String! userId: String sqon: JSON! path: String! sort: [Sort] refresh: EsRefresh tag: String): Set
-    deleteSaveSets(setIds: [String!] userId: String!): Int`
+    deleteSaveSets(setIds: [String!] userId: String!): Int
+    updateSaveSet(tag: String userId: String!, setId: String!): String
+    `
         : `
     saveSet(type: String! userId: String sqon: JSON! path: String! sort: [Sort] refresh: EsRefresh tag: String): Set
-    deleteSaveSets(setIds: [String!] userId: String!): Int`
+    deleteSaveSets(setIds: [String!] userId: String!): Int
+    updateSaveSet(tag: String userId: String!, setId: String!): String
+    `
     }
   }
 
@@ -79,6 +85,7 @@ export let typeDefs = ({ types, rootTypes, scalarTypes, enableAdmin }) => [
   SortTypeDefs,
   StateTypeDefs,
   DeleteSets,
+  EditSets,
   ...types.map(([key, type]) => mappingToFields({ key, type, parent: '' })),
 ];
 
@@ -231,6 +238,7 @@ export let resolvers = ({
           : {})(),
       saveSet: saveSet({ types, callback: callbacks?.saveSet }),
       deleteSaveSets: deleteSaveSets({ callback: callbacks?.saveSet }),
+      updateSaveSet: updateSaveSet({ callback: callbacks?.saveSet }),
     },
   };
 };

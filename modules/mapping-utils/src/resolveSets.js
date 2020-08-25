@@ -3,6 +3,12 @@ import uuid from 'uuid/v4';
 import { CONSTANTS, buildQuery } from '@kfarranger/middleware';
 import { isTagValid } from './utils/sets';
 
+const ActionTypes = {
+  CREATE: 'Create',
+  DELETE: 'Delete',
+  UPDATE: 'Update',
+};
+
 const retrieveSetIds = async ({
   es,
   index,
@@ -97,7 +103,7 @@ export const saveSet = ({ types, callback }) => async (
   });
 
   if (tag) {
-    await callback(body);
+    await callback({ type: ActionTypes.CREATE, values: body });
   }
   return body;
 };
@@ -113,15 +119,75 @@ export const deleteSaveSets = ({ callback }) => async (
     body: {
       query: {
         terms: {
-          setId: setIds,
+          setId: userOwnedSaveSets(userId, setIds, es),
         },
       },
     },
   });
 
   if (isFunction(callback)) {
-    await callback({ userId: userId, setIds: setIds, toDelete: true });
+    await callback({
+      userId: userId,
+      setIds: setIds,
+      type: ActionTypes.DELETE,
+    });
   }
 
   return esResponse.deleted;
+};
+
+export const updateSaveSet = ({ callback }) => async (
+  obj,
+  { setId, tag, userId },
+  { es },
+) => {
+  const ownSaveSet = await userOwnedSaveSets(userId, [setId], es);
+
+  const esResponse = await es.update({
+    index: CONSTANTS.ES_ARRANGER_SET_INDEX,
+    type: CONSTANTS.ES_ARRANGER_SET_TYPE,
+    id: ownSaveSet[0] || '',
+    body: {
+      doc: {
+        tag: tag,
+      },
+    },
+  });
+
+  if (isFunction(callback)) {
+    await callback({
+      userId: userId,
+      id: setId,
+      type: ActionTypes.UPDATE,
+      values: {
+        tag: tag,
+      },
+    });
+  }
+
+  return esResponse.result;
+};
+
+const userOwnedSaveSets = async (userId, setIds, es) => {
+  const esResponse = await es.search({
+    index: CONSTANTS.ES_ARRANGER_SET_INDEX,
+    type: CONSTANTS.ES_ARRANGER_SET_TYPE,
+    body: {
+      query: {
+        bool: {
+          must: [
+            {
+              terms: {
+                setId: setIds,
+              },
+            },
+          ],
+          filter: {
+            term: { userId: userId },
+          },
+        },
+      },
+    },
+  });
+  return esResponse.hits?.hits?.map(h => h._source.setId) || [];
 };
