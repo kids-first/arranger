@@ -1,6 +1,6 @@
 {
   "name": "@kfarranger/components",
-  "version": "1.12.1",
+  "version": "1.13.0",
   "description": "Data Portal Components",
   "main": "dist/index.js",
   "publishConfig": {
