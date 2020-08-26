@@ -62,12 +62,12 @@ let RootTypeDefs = ({ types, rootTypes, scalarTypes, enableAdmin }) => `
     saveMatchBoxState(graphqlField: String! state: JSON!): MatchBoxState
     saveSet(type: String! userId: String sqon: JSON! path: String! sort: [Sort] refresh: EsRefresh tag: String): Set
     deleteSaveSets(setIds: [String!] userId: String!): Int
-    updateSaveSet(tag: String userId: String!, setId: String!): String
+    updateSaveSet(tag: String! userId: String!, setId: String!): String
     `
         : `
     saveSet(type: String! userId: String sqon: JSON! path: String! sort: [Sort] refresh: EsRefresh tag: String): Set
     deleteSaveSets(setIds: [String!] userId: String!): Int
-    updateSaveSet(tag: String userId: String!, setId: String!): String
+    updateSaveSet(tag: String! userId: String!, setId: String!): String
     `
     }
   }

@@ -9,6 +9,30 @@ const ActionTypes = {
   UPDATE: 'Update',
 };
 
+const userOwnedSaveSets = async (userId, setIds, es) => {
+  const esResponse = await es.search({
+    index: CONSTANTS.ES_ARRANGER_SET_INDEX,
+    type: CONSTANTS.ES_ARRANGER_SET_TYPE,
+    body: {
+      query: {
+        bool: {
+          must: [
+            {
+              terms: {
+                setId: setIds,
+              },
+            },
+          ],
+          filter: {
+            term: { userId: userId },
+          },
+        },
+      },
+    },
+  });
+  return esResponse.hits?.hits?.map(h => h._source.setId) || [];
+};
+
 const retrieveSetIds = async ({
   es,
   index,
@@ -166,28 +190,4 @@ export const updateSaveSet = ({ callback }) => async (
   }
 
   return esResponse.result;
-};
-
-const userOwnedSaveSets = async (userId, setIds, es) => {
-  const esResponse = await es.search({
-    index: CONSTANTS.ES_ARRANGER_SET_INDEX,
-    type: CONSTANTS.ES_ARRANGER_SET_TYPE,
-    body: {
-      query: {
-        bool: {
-          must: [
-            {
-              terms: {
-                setId: setIds,
-              },
-            },
-          ],
-          filter: {
-            term: { userId: userId },
-          },
-        },
-      },
-    },
-  });
-  return esResponse.hits?.hits?.map(h => h._source.setId) || [];
 };
