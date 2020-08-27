@@ -4,9 +4,13 @@ import { CONSTANTS, buildQuery } from '@kfarranger/middleware';
 import { isTagValid } from './utils/sets';
 
 const ActionTypes = {
-  CREATE: 'Create',
-  DELETE: 'Delete',
-  UPDATE: 'Update',
+  CREATE: 'CREATE',
+  DELETE: 'DELETE',
+  UPDATE: 'UPDATE',
+};
+
+const SubActionTypes = {
+  RENAME_TAG: 'RENAME_TAG',
 };
 
 const userOwnedSaveSets = async (userId, setIds, es) => {
@@ -127,7 +131,7 @@ export const saveSet = ({ types, callback }) => async (
   });
 
   if (tag) {
-    await callback({ type: ActionTypes.CREATE, values: body });
+    await callback({ actionType: ActionTypes.CREATE, values: body });
   }
   return body;
 };
@@ -151,18 +155,20 @@ export const deleteSaveSets = ({ callback }) => async (
 
   if (isFunction(callback)) {
     await callback({
-      userId: userId,
-      setIds: setIds,
-      type: ActionTypes.DELETE,
+      actionType: ActionTypes.DELETE,
+      values: {
+        userId: userId,
+        setIds: setIds,
+      },
     });
   }
 
   return esResponse.deleted;
 };
 
-export const updateSaveSet = ({ callback }) => async (
+export const renameSaveSetTag = ({ callback }) => async (
   obj,
-  { setId, tag, userId },
+  { setId, tag, userId, updateType },
   { es },
 ) => {
   const ownSaveSet = await userOwnedSaveSets(userId, [setId], es);
@@ -180,10 +186,11 @@ export const updateSaveSet = ({ callback }) => async (
 
   if (isFunction(callback)) {
     await callback({
-      userId: userId,
-      id: setId,
-      type: ActionTypes.UPDATE,
+      actionType: ActionTypes.UPDATE,
+      subActionType: SubActionTypes.RENAME_TAG,
       values: {
+        userId: userId,
+        setId: setId,
         tag: tag,
       },
     });
