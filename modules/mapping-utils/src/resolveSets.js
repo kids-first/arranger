@@ -168,7 +168,7 @@ export const deleteSaveSets = ({ callback }) => async (
 
 export const renameSaveSetTag = ({ callback }) => async (
   obj,
-  { setId, tag, userId, updateType },
+  { setId, tag, userId },
   { es },
 ) => {
   const ownSaveSet = await userOwnedSaveSets(userId, [setId], es);
