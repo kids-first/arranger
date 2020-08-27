@@ -4,7 +4,7 @@ export {
   default as resolveSets,
   saveSet,
   deleteSaveSets,
-  updateSaveSet,
+  renameSaveSetTag,
 } from './resolveSets';
 export { default as mappingToFields } from './mappingToFields';
 export { default as mappingToAggsType } from './mappingToAggsType';
