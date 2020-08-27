@@ -1,6 +1,6 @@
 {
   "name": "@kfarranger/mapping-utils",
-  "version": "1.12.1",
+  "version": "1.12.2",
   "description": "Transform Elasticsearch mappings",
   "main": "dist/index.js",
   "publishConfig": {

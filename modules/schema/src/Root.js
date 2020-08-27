@@ -238,7 +238,7 @@ export let resolvers = ({
           : {})(),
       saveSet: saveSet({ types, callback: callbacks?.saveSet }),
       deleteSaveSets: deleteSaveSets({ callback: callbacks?.saveSet }),
-      renameSaveSetTag: updateSaveSet({ callback: callbacks?.saveSet }),
+      renameSaveSetTag: renameSaveSetTag({ callback: callbacks?.saveSet }),
     },
   };
 };
