@@ -13,30 +13,6 @@ const SubActionTypes = {
   RENAME_TAG: 'RENAME_TAG',
 };
 
-const userOwnedSaveSets = async (userId, setIds, es) => {
-  const esResponse = await es.search({
-    index: CONSTANTS.ES_ARRANGER_SET_INDEX,
-    type: CONSTANTS.ES_ARRANGER_SET_TYPE,
-    body: {
-      query: {
-        bool: {
-          must: [
-            {
-              terms: {
-                setId: setIds,
-              },
-            },
-          ],
-          filter: {
-            term: { userId: userId },
-          },
-        },
-      },
-    },
-  });
-  return esResponse.hits?.hits?.map(h => h._source.setId) || [];
-};
-
 const retrieveSetIds = async ({
   es,
   index,
@@ -146,8 +122,15 @@ export const deleteSaveSets = ({ callback }) => async (
     type: CONSTANTS.ES_ARRANGER_SET_TYPE,
     body: {
       query: {
-        terms: {
-          setId: userOwnedSaveSets(userId, setIds, es),
+        bool: {
+          filter: {
+            term: { userId: userId },
+          },
+          must: {
+            terms: {
+              setId: setIds,
+            },
+          },
         },
       },
     },
@@ -171,15 +154,28 @@ export const renameSaveSetTag = ({ callback }) => async (
   { setId, tag, userId },
   { es },
 ) => {
-  const ownSaveSet = await userOwnedSaveSets(userId, [setId], es);
-
-  const esResponse = await es.update({
+  const esResponse = await es.updateByQuery({
     index: CONSTANTS.ES_ARRANGER_SET_INDEX,
     type: CONSTANTS.ES_ARRANGER_SET_TYPE,
-    id: ownSaveSet[0] || '',
+    refresh: true,
     body: {
-      doc: {
-        tag: tag,
+      script: {
+        lang: 'painless',
+        source: `ctx._source['tag'] = '${tag}'`,
+      },
+      query: {
+        bool: {
+          filter: {
+            term: { userId: userId },
+          },
+          must: {
+            term: {
+              setId: {
+                value: setId,
+              },
+            },
+          },
+        },
       },
     },
   });
@@ -196,5 +192,5 @@ export const renameSaveSetTag = ({ callback }) => async (
     });
   }
 
-  return esResponse.result;
+  return esResponse.updated;
 };
