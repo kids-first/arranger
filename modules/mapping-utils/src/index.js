@@ -3,8 +3,8 @@ export { default as createConnectionResolvers } from './createConnectionResolver
 export {
   default as resolveSets,
   saveSet,
-  deleteSaveSets,
-  renameSaveSetTag,
+  updateSet,
+  deleteSets,
 } from './resolveSets';
 export { default as mappingToFields } from './mappingToFields';
 export { default as mappingToAggsType } from './mappingToAggsType';

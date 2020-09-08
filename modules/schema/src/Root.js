@@ -7,9 +7,9 @@ import Parallel from 'paralleljs';
 import {
   createConnectionResolvers,
   saveSet,
-  deleteSaveSets,
+  updateSet,
   mappingToFields,
-  renameSaveSetTag,
+  deleteSets,
 } from '@kfarranger/mapping-utils';
 
 import { typeDefs as AggregationsTypeDefs } from './Aggregations';
@@ -54,21 +54,48 @@ let RootTypeDefs = ({ types, rootTypes, scalarTypes, enableAdmin }) => `
 
   ${rootTypes.map(([, type]) => type.typeDefs)}
 
+  enum SetActionTypes {
+     CREATE
+     DELETE
+     UPDATE
+  }
+  
+  enum SetSubActionTypes {
+     RENAME_TAG
+     ADD_IDS
+     REMOVE_IDS
+  }
+
+ enum SetSourceType {
+  QUERY
+  SAVE_SET
+ }
+ 
+ input SetUpdateInputData {
+    type: String,
+    sqon: JSON,
+    path: String,
+    newTag: String
+ }
+ 
+ input SetUpdateSource {
+    sourceType: SetSourceType!
+  }
+  
+  input SetUpdateTarget {
+    setId: String!,
+  }
+
   type Mutation {
+    saveSet(type: String! userId: String sqon: JSON! path: String! sort: [Sort] refresh: EsRefresh tag: String): Set
+    deleteSets(setIds: [String!] userId: String!): Int
+    updateSet(source: SetUpdateSource! data: SetUpdateInputData! subAction: SetSubActionTypes! userId: String! target: SetUpdateTarget!): Int
     ${
       enableAdmin
         ? `saveAggsState(graphqlField: String! state: JSON!): AggsState
-    saveColumnsState(graphqlField: String! state: JSON!): ColumnsState
-    saveMatchBoxState(graphqlField: String! state: JSON!): MatchBoxState
-    saveSet(type: String! userId: String sqon: JSON! path: String! sort: [Sort] refresh: EsRefresh tag: String): Set
-    deleteSaveSets(setIds: [String!] userId: String!): Int
-    renameSaveSetTag(tag: String! userId: String!, setId: String!): Int
-    `
-        : `
-    saveSet(type: String! userId: String sqon: JSON! path: String! sort: [Sort] refresh: EsRefresh tag: String): Set
-    deleteSaveSets(setIds: [String!] userId: String!): Int
-    renameSaveSetTag(tag: String! userId: String!, setId: String!): Int
-    `
+           saveColumnsState(graphqlField: String! state: JSON!): ColumnsState
+           saveMatchBoxState(graphqlField: String! state: JSON!): MatchBoxState`
+        : ``
     }
   }
 
@@ -237,8 +264,12 @@ export let resolvers = ({
             }
           : {})(),
       saveSet: saveSet({ types, callback: callbacks?.saveSet }),
-      deleteSaveSets: deleteSaveSets({ callback: callbacks?.saveSet }),
-      renameSaveSetTag: renameSaveSetTag({ callback: callbacks?.saveSet }),
+      deleteSets: deleteSets({ callback: callbacks?.saveSet }),
+      updateSet: updateSet({
+        types,
+        callback: callbacks?.saveSet,
+      }),
     },
   };
 };
+//TODO rename...
