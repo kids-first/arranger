@@ -315,7 +315,7 @@ export const updateSet = ({ types, callback }) => async (
         body: {
           script: {
             lang: 'painless',
-            source: `ctx._source.tag = params.newTag'`,
+            source: `ctx._source.tag = params.newTag`,
             params: {
               newTag,
             },
