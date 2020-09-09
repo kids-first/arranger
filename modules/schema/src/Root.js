@@ -86,10 +86,15 @@ let RootTypeDefs = ({ types, rootTypes, scalarTypes, enableAdmin }) => `
     setId: String!,
   }
 
+  type UpdateSetResult {
+    setSize: Int
+    updatedResults: Int!
+  }
+
   type Mutation {
     saveSet(type: String! userId: String sqon: JSON! path: String! sort: [Sort] refresh: EsRefresh tag: String): Set
     deleteSets(setIds: [String!] userId: String!): Int
-    updateSet(source: SetUpdateSource! data: SetUpdateInputData! subAction: SetSubActionTypes! userId: String! target: SetUpdateTarget!): Int
+    updateSet(source: SetUpdateSource! data: SetUpdateInputData! subAction: SetSubActionTypes! userId: String! target: SetUpdateTarget!): UpdateSetResult
     ${
       enableAdmin
         ? `saveAggsState(graphqlField: String! state: JSON!): AggsState

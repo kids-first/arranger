@@ -255,6 +255,8 @@ export const updateSet = ({ types, callback }) => async (
           combinedSqon = removeSqonToSetSqon(sqonFromExistingSet, sqon);
         }
 
+        const idsSize = updatedIds.length;
+
         const esUpdateResponse = await es.updateByQuery({
           index: CONSTANTS.ES_ARRANGER_SET_INDEX,
           type: CONSTANTS.ES_ARRANGER_SET_TYPE,
@@ -265,7 +267,7 @@ export const updateSet = ({ types, callback }) => async (
               source: `ctx._source.ids = params.updatedIds ; ctx._source.size = params.newSize; ctx._source.sqon = params.combinedSqon`,
               params: {
                 updatedIds: updatedIds,
-                newSize: updatedIds.length,
+                newSize: idsSize,
                 combinedSqon,
               },
             },
@@ -300,7 +302,10 @@ export const updateSet = ({ types, callback }) => async (
           });
         }
 
-        return esUpdateResponse.updated;
+        return {
+          setSize: idsSize,
+          updatedResults: esUpdateResponse.updated,
+        };
       } else {
         throw new Error('Unsupported source type');
       }
@@ -348,7 +353,9 @@ export const updateSet = ({ types, callback }) => async (
           },
         });
       }
-      return esResponse.updated;
+      return {
+        updatedResults: esResponse.updated,
+      };
     }
     default:
       throw new Error('Unsupported subAction');
