@@ -1,4 +1,4 @@
-import { get, isEmpty, isFunction } from 'lodash';
+import { isFunction } from 'lodash';
 import uuid from 'uuid/v4';
 import { CONSTANTS, buildQuery } from '@kfarranger/middleware';
 import {
@@ -7,6 +7,7 @@ import {
   removeSqonToSetSqon,
   makeUnique,
   truncateIds,
+  retrieveIdsFromQuery,
 } from './utils/sets';
 import mapHits from './utils/mapHits';
 
@@ -29,53 +30,232 @@ const SourceType = {
   SAVE_SET: 'SAVE_SET',
 };
 
-const handleResult = async ({ search, searchAfter, total, ids = [] }) => {
-  if (ids.length === total) return makeUnique(ids);
-  const { ids: newIds, ...response } = await search({ searchAfter });
-  return handleResult({ ...response, ids: [...ids, ...newIds] });
+const addOrRemoveIds = async ({
+  types,
+  callback,
+  es,
+  userId,
+  setId,
+  sqon,
+  subAction,
+  type,
+  path,
+}) => {
+  const esSearchResponse = await es.search({
+    index: CONSTANTS.ES_ARRANGER_SET_INDEX,
+    type: CONSTANTS.ES_ARRANGER_SET_TYPE,
+    body: {
+      query: {
+        bool: {
+          filter: {
+            term: { userId: userId },
+          },
+          must: {
+            term: {
+              setId: {
+                value: setId,
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const sets = mapHits(esSearchResponse);
+  if (sets.length === 0) {
+    throw new Error('Internal error');
+  }
+
+  const { nested_fields: nestedFields, es_type, index } = types.find(
+    ([, x]) => x.name === type,
+  )[1];
+
+  const query = buildQuery({ nestedFields, filters: sqon || {} });
+
+  const idsFromQuery = await retrieveIdsFromQuery({
+    es,
+    index: index,
+    type: es_type,
+    query,
+    path,
+    sort: [{ field: '_id', order: 'asc' }],
+  });
+
+  if (idsFromQuery.length === 0) {
+    return;
+  }
+
+  const setToUpdate = sets[0];
+
+  const { ids = [], tag, createdAt, sqon: sqonFromExistingSet } = setToUpdate;
+
+  let updatedIds = [];
+  let combinedSqon;
+  if (SubActionTypes.ADD_IDS === subAction) {
+    const concatenatedIds = [...ids, ...idsFromQuery];
+    updatedIds = truncateIds(makeUnique(concatenatedIds));
+    combinedSqon = addSqonToSetSqon(sqonFromExistingSet, sqon);
+  } else if (SubActionTypes.REMOVE_IDS === subAction) {
+    updatedIds = ids.filter(id => !idsFromQuery.includes(id));
+    combinedSqon = removeSqonToSetSqon(sqonFromExistingSet, sqon);
+  }
+
+  const idsSize = updatedIds.length;
+
+  const esUpdateResponse = await es.updateByQuery({
+    index: CONSTANTS.ES_ARRANGER_SET_INDEX,
+    type: CONSTANTS.ES_ARRANGER_SET_TYPE,
+    refresh: true,
+    body: {
+      script: {
+        lang: 'painless',
+        source: `ctx._source.ids = params.updatedIds ; ctx._source.size = params.newSize; ctx._source.sqon = params.combinedSqon`,
+        params: {
+          updatedIds: updatedIds,
+          newSize: idsSize,
+          combinedSqon,
+        },
+      },
+      query: {
+        bool: {
+          filter: {
+            term: { userId: userId },
+          },
+          must: {
+            term: {
+              setId: {
+                value: setId,
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (isFunction(callback)) {
+    await callback({
+      actionType: ActionTypes.UPDATE,
+      subAction: subAction,
+      values: {
+        userId: userId,
+        ids: updatedIds,
+        setId,
+        createdAt,
+        tag,
+      },
+    });
+  }
+
+  return {
+    setSize: idsSize,
+    updatedResults: esUpdateResponse.updated,
+  };
 };
 
-const retrieveIdsFromQuery = async ({
+const renameTag = async ({
   es,
-  index,
-  type,
-  query,
-  path,
-  sort,
-  BULK_SIZE = 1000,
+  setId,
+  newTag,
+  subAction,
+  userId,
+  callback,
 }) => {
-  const search = async ({ searchAfter } = {}) => {
-    const body = {
-      ...(!isEmpty(query) && { query }),
-      ...(searchAfter && { search_after: searchAfter }),
-    };
+  const esResponse = await es.updateByQuery({
+    index: CONSTANTS.ES_ARRANGER_SET_INDEX,
+    type: CONSTANTS.ES_ARRANGER_SET_TYPE,
+    refresh: true,
+    body: {
+      script: {
+        lang: 'painless',
+        source: `ctx._source.tag = params.newTag`,
+        params: {
+          newTag,
+        },
+      },
+      query: {
+        bool: {
+          filter: {
+            term: { userId: userId },
+          },
+          must: {
+            term: {
+              setId: {
+                value: setId,
+              },
+            },
+          },
+        },
+      },
+    },
+  });
 
-    const response = await es.search({
-      index,
-      type,
-      sort: sort.map(({ field, order }) => `${field}:${order || 'asc'}`),
-      size: BULK_SIZE,
-      body,
+  if (isFunction(callback)) {
+    await callback({
+      actionType: ActionTypes.UPDATE,
+      subActionType: subAction,
+      values: {
+        userId: userId,
+        setId: setId,
+        newTag,
+      },
     });
-    const ids = response.hits.hits.map(x =>
-      get(x, `_source.${path.split('__').join('.')}`, x._id || ''),
-    );
-
-    const nextSearchAfter = sort
-      .map(({ field }) =>
-        response.hits.hits.map(x => x._source[field] || x[field]),
-      )
-      .reduce((acc, vals) => [...acc, ...vals.slice(-1)], []);
-
-    return {
-      ids,
-      searchAfter: nextSearchAfter,
-      total: response.hits.total,
-      search,
-    };
+  }
+  return {
+    updatedResults: esResponse.updated,
   };
+};
 
-  return handleResult(await search());
+export const updateSet = ({ types, callback }) => async (
+  obj,
+  { source, subAction, target, userId, data },
+  { es },
+) => {
+  const { sourceType } = source;
+
+  switch (subAction) {
+    case SubActionTypes.REMOVE_IDS:
+    case SubActionTypes.ADD_IDS: {
+      if (SourceType.QUERY === sourceType) {
+        const { type, sqon, path } = data;
+
+        if (isQueryEmpty(sqon)) {
+          throw new Error('Query must not be empty');
+        }
+
+        const { setId } = target;
+
+        return await addOrRemoveIds({
+          es,
+          types,
+          callback,
+          userId,
+          setId,
+          sqon,
+          subAction,
+          type,
+          path,
+        });
+      } else {
+        throw new Error('Internal error');
+      }
+    }
+    case SubActionTypes.RENAME_TAG: {
+      const { setId } = target;
+      const { newTag } = data;
+      return await renameTag({
+        es,
+        callback,
+        subAction,
+        userId,
+        setId,
+        newTag,
+      });
+    }
+    default:
+      throw new Error('Unsupported action');
+  }
 };
 
 export const saveSet = ({ types, callback }) => async (
@@ -173,195 +353,4 @@ export const deleteSets = ({ callback }) => async (
   }
 
   return esResponse.deleted;
-};
-
-export const updateSet = ({ types, callback }) => async (
-  obj,
-  { source, subAction, target, userId, data },
-  { es },
-) => {
-  const { sourceType } = source;
-
-  switch (subAction) {
-    case SubActionTypes.REMOVE_IDS:
-    case SubActionTypes.ADD_IDS: {
-      if (SourceType.QUERY === sourceType) {
-        const { type, sqon, path } = data;
-
-        if (isQueryEmpty(sqon)) {
-          throw new Error('Query must not be empty');
-        }
-
-        const { setId } = target;
-
-        const esSearchResponse = await es.search({
-          index: CONSTANTS.ES_ARRANGER_SET_INDEX,
-          type: CONSTANTS.ES_ARRANGER_SET_TYPE,
-          body: {
-            query: {
-              bool: {
-                filter: {
-                  term: { userId: userId },
-                },
-                must: {
-                  term: {
-                    setId: {
-                      value: setId,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        const sets = mapHits(esSearchResponse);
-        if (sets.length === 0) {
-          throw new Error('Internal error');
-        }
-
-        const { nested_fields: nestedFields, es_type, index } = types.find(
-          ([, x]) => x.name === type,
-        )[1];
-
-        const query = buildQuery({ nestedFields, filters: sqon || {} });
-
-        const idsFromQuery = await retrieveIdsFromQuery({
-          es,
-          index: index,
-          type: es_type,
-          query,
-          path,
-          sort: [{ field: '_id', order: 'asc' }],
-        });
-
-        if (idsFromQuery.length === 0) {
-          return;
-        }
-
-        const setToUpdate = sets[0];
-
-        const {
-          ids = [],
-          tag,
-          createdAt,
-          sqon: sqonFromExistingSet,
-        } = setToUpdate;
-
-        let updatedIds = [];
-        let combinedSqon;
-        if (SubActionTypes.ADD_IDS === subAction) {
-          const concatenatedIds = [...ids, ...idsFromQuery];
-          updatedIds = truncateIds(makeUnique(concatenatedIds));
-          combinedSqon = addSqonToSetSqon(sqonFromExistingSet, sqon);
-        } else if (SubActionTypes.REMOVE_IDS === subAction) {
-          updatedIds = ids.filter(id => !idsFromQuery.includes(id));
-          combinedSqon = removeSqonToSetSqon(sqonFromExistingSet, sqon);
-        }
-
-        const idsSize = updatedIds.length;
-
-        const esUpdateResponse = await es.updateByQuery({
-          index: CONSTANTS.ES_ARRANGER_SET_INDEX,
-          type: CONSTANTS.ES_ARRANGER_SET_TYPE,
-          refresh: true,
-          body: {
-            script: {
-              lang: 'painless',
-              source: `ctx._source.ids = params.updatedIds ; ctx._source.size = params.newSize; ctx._source.sqon = params.combinedSqon`,
-              params: {
-                updatedIds: updatedIds,
-                newSize: idsSize,
-                combinedSqon,
-              },
-            },
-            query: {
-              bool: {
-                filter: {
-                  term: { userId: userId },
-                },
-                must: {
-                  term: {
-                    setId: {
-                      value: setId,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        if (isFunction(callback)) {
-          await callback({
-            actionType: ActionTypes.UPDATE,
-            subAction: subAction,
-            values: {
-              userId: userId,
-              ids: updatedIds,
-              setId,
-              createdAt,
-              tag,
-            },
-          });
-        }
-
-        return {
-          setSize: idsSize,
-          updatedResults: esUpdateResponse.updated,
-        };
-      } else {
-        throw new Error('Internal error');
-      }
-    }
-    case SubActionTypes.RENAME_TAG: {
-      const { setId } = target;
-      const { newTag } = data;
-      const esResponse = await es.updateByQuery({
-        index: CONSTANTS.ES_ARRANGER_SET_INDEX,
-        type: CONSTANTS.ES_ARRANGER_SET_TYPE,
-        refresh: true,
-        body: {
-          script: {
-            lang: 'painless',
-            source: `ctx._source.tag = params.newTag`,
-            params: {
-              newTag,
-            },
-          },
-          query: {
-            bool: {
-              filter: {
-                term: { userId: userId },
-              },
-              must: {
-                term: {
-                  setId: {
-                    value: setId,
-                  },
-                },
-              },
-            },
-          },
-        },
-      });
-
-      if (isFunction(callback)) {
-        await callback({
-          actionType: ActionTypes.UPDATE,
-          subActionType: subAction,
-          values: {
-            userId: userId,
-            setId: setId,
-            newTag,
-          },
-        });
-      }
-      return {
-        updatedResults: esResponse.updated,
-      };
-    }
-    default:
-      throw new Error('Unsupported action');
-  }
 };
