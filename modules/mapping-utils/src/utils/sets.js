@@ -1,8 +1,11 @@
-const MAX_LENGTH_NAME = 50;
-const REGEX_FOR_TAG = /^[a-zA-Z0-9-_]*$/;
+const REGEX_FOR_TAG = /^[a-zA-Z0-9-_ ]*$/;
 
-export const isTagValid = tag =>
-  tag.length <= MAX_LENGTH_NAME && REGEX_FOR_TAG.test(tag);
+export const MAX_LENGTH_TAG = 50;
+
+export const isTagValid = rawTag => {
+  const tag = (rawTag || '').trim();
+  return !!tag && tag.length <= MAX_LENGTH_TAG && REGEX_FOR_TAG.test(tag);
+};
 
 export const addSqonToSetSqon = (receivingSqon, donorSqon, op = 'or') => {
   // Fixme incomplete

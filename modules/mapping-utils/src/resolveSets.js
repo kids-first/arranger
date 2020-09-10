@@ -83,6 +83,10 @@ export const saveSet = ({ types, callback }) => async (
   { type, userId, sqon, path, sort, refresh = 'WAIT_FOR', tag },
   { es },
 ) => {
+  if (isQueryEmpty(sqon)) {
+    throw new Error('Query must not be empty.');
+  }
+
   if (tag) {
     // if a tag is present, test early.
     if (!isTagValid(tag)) {
