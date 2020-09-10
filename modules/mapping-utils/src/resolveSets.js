@@ -90,9 +90,9 @@ export const saveSet = ({ types, callback }) => async (
   if (tag) {
     // if a tag is present, test early.
     if (!isTagValid(tag)) {
-      throw new Error('Invalid tag, no set created.');
+      throw new Error('Invalid tag.');
     } else if (!isFunction(callback)) {
-      throw new Error('Cannot process further, no set created.');
+      throw new Error('Internal error.');
     }
   }
   const { nested_fields: nestedFields, es_type, index } = types.find(
@@ -217,7 +217,7 @@ export const updateSet = ({ types, callback }) => async (
 
         const sets = mapHits(esSearchResponse);
         if (sets.length === 0) {
-          throw new Error('Set not found.');
+          throw new Error('Internal error.');
         }
 
         const { nested_fields: nestedFields, es_type, index } = types.find(
@@ -311,7 +311,7 @@ export const updateSet = ({ types, callback }) => async (
           updatedResults: esUpdateResponse.updated,
         };
       } else {
-        throw new Error('Unsupported source type');
+        throw new Error('Internal error.');
       }
     }
     case SubActionTypes.RENAME_TAG: {
@@ -362,6 +362,6 @@ export const updateSet = ({ types, callback }) => async (
       };
     }
     default:
-      throw new Error('Unsupported subAction');
+      throw new Error('Unsupported action.');
   }
 };
