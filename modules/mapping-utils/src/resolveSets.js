@@ -62,11 +62,6 @@ const addOrRemoveIds = async ({
     },
   });
 
-  const sets = mapHits(esSearchResponse);
-  if (sets.length === 0) {
-    throw new Error('Internal error');
-  }
-
   const { nested_fields: nestedFields, es_type, index } = types.find(
     ([, x]) => x.name === type,
   )[1];
@@ -83,9 +78,11 @@ const addOrRemoveIds = async ({
   });
 
   if (idsFromQuery.length === 0) {
-    return;
+    return {
+      updatedResults: 0,
+    };
   }
-
+  const sets = mapHits(esSearchResponse);
   const setToUpdate = sets[0];
 
   const { ids = [], tag, createdAt, sqon: sqonFromExistingSet } = setToUpdate;
@@ -221,7 +218,9 @@ export const updateSet = ({ types, callback }) => async (
         const { type, sqon, path } = data;
 
         if (isQueryEmpty(sqon)) {
-          throw new Error('Query must not be empty');
+          return {
+            updatedResults: 0,
+          };
         }
 
         const { setId } = target;
@@ -238,7 +237,9 @@ export const updateSet = ({ types, callback }) => async (
           path,
         });
       } else {
-        throw new Error('Internal error');
+        return {
+          updatedResults: 0,
+        };
       }
     }
     case SubActionTypes.RENAME_TAG: {
@@ -254,7 +255,9 @@ export const updateSet = ({ types, callback }) => async (
       });
     }
     default:
-      throw new Error('Unsupported action');
+      return {
+        updatedResults: 0,
+      };
   }
 };
 
@@ -263,16 +266,12 @@ export const saveSet = ({ types, callback }) => async (
   { type, userId, sqon, path, sort, refresh = 'WAIT_FOR', tag },
   { es },
 ) => {
-  if (isQueryEmpty(sqon)) {
-    throw new Error('Query must not be empty');
-  }
-
   if (tag) {
     // if a tag is present, test early.
     if (!isTagValid(tag)) {
-      throw new Error('Invalid tag');
+      return null;
     } else if (!isFunction(callback)) {
-      throw new Error('Internal error');
+      return null;
     }
   }
   const { nested_fields: nestedFields, es_type, index } = types.find(
