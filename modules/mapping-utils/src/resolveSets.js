@@ -159,6 +159,12 @@ const renameTag = async ({
   userId,
   callback,
 }) => {
+  if (!isTagValid(newTag)) {
+    return {
+      updatedResults: 0,
+    };
+  }
+
   const esResponse = await es.updateByQuery({
     index: CONSTANTS.ES_ARRANGER_SET_INDEX,
     type: CONSTANTS.ES_ARRANGER_SET_TYPE,
