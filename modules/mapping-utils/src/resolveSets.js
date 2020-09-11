@@ -268,9 +268,7 @@ export const saveSet = ({ types, callback }) => async (
 ) => {
   if (tag) {
     // if a tag is present, test early.
-    if (!isTagValid(tag)) {
-      return null;
-    } else if (!isFunction(callback)) {
+    if (!isTagValid(tag) || !isFunction(callback)) {
       return null;
     }
   }
