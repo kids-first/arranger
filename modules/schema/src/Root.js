@@ -93,8 +93,8 @@ let RootTypeDefs = ({ types, rootTypes, scalarTypes, enableAdmin }) => `
 
   type Mutation {
     saveSet(type: String! userId: String sqon: JSON! path: String! sort: [Sort] refresh: EsRefresh tag: String): Set
-    deleteSets(setIds: [String!] userId: String!): Int
-    updateSet(source: SetUpdateSource! data: SetUpdateInputData! subAction: SetSubActionTypes! userId: String! target: SetUpdateTarget!): UpdateSetResult
+    deleteSets(setIds: [String!]): Int
+    updateSet(source: SetUpdateSource! data: SetUpdateInputData! subAction: SetSubActionTypes! target: SetUpdateTarget!): UpdateSetResult
     ${
       enableAdmin
         ? `saveAggsState(graphqlField: String! state: JSON!): AggsState
@@ -268,11 +268,11 @@ export let resolvers = ({
               },
             }
           : {})(),
-      saveSet: saveSet({ types, callback: callbacks?.saveSet }),
-      deleteSets: deleteSets({ callback: callbacks?.saveSet }),
+      saveSet: saveSet({ types, postProcessCb: callbacks?.postProcessSets }),
+      deleteSets: deleteSets({ postProcessCb: callbacks?.postProcessSets }),
       updateSet: updateSet({
         types,
-        callback: callbacks?.saveSet,
+        postProcessCb: callbacks?.postProcessSets,
       }),
     },
   };
