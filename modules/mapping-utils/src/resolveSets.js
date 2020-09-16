@@ -32,7 +32,7 @@ const SourceType = {
 
 const addOrRemoveIds = async ({
   types,
-  callback,
+  postProcessCb,
   es,
   userId,
   setId,
@@ -131,8 +131,8 @@ const addOrRemoveIds = async ({
     },
   });
 
-  if (isFunction(callback)) {
-    await callback({
+  if (isFunction(postProcessCb)) {
+    await postProcessCb({
       actionType: ActionTypes.UPDATE,
       subAction: subAction,
       values: {
@@ -157,7 +157,7 @@ const renameTag = async ({
   newTag,
   subAction,
   userId,
-  callback,
+  postProcessCb,
 }) => {
   if (!isTagValid(newTag)) {
     return {
@@ -194,8 +194,8 @@ const renameTag = async ({
     },
   });
 
-  if (isFunction(callback)) {
-    await callback({
+  if (isFunction(postProcessCb)) {
+    await postProcessCb({
       actionType: ActionTypes.UPDATE,
       subActionType: subAction,
       values: {
@@ -210,7 +210,7 @@ const renameTag = async ({
   };
 };
 
-export const updateSet = ({ types, callback }) => async (
+export const updateSet = ({ types, postProcessCb }) => async (
   obj,
   { source, subAction, target, userId, data },
   { es },
@@ -234,7 +234,7 @@ export const updateSet = ({ types, callback }) => async (
         return await addOrRemoveIds({
           es,
           types,
-          callback,
+          postProcessCb,
           userId,
           setId,
           sqon,
@@ -253,7 +253,7 @@ export const updateSet = ({ types, callback }) => async (
       const { newTag } = data;
       return await renameTag({
         es,
-        callback,
+        postProcessCb,
         subAction,
         userId,
         setId,
@@ -267,14 +267,14 @@ export const updateSet = ({ types, callback }) => async (
   }
 };
 
-export const saveSet = ({ types, callback }) => async (
+export const saveSet = ({ types, postProcessCb }) => async (
   obj,
   { type, userId, sqon, path, sort, refresh = 'WAIT_FOR', tag },
   { es },
 ) => {
   if (tag) {
     // if a tag is present, test early.
-    if (!isTagValid(tag) || !isFunction(callback)) {
+    if (!isTagValid(tag) || !isFunction(postProcessCb)) {
       return null;
     }
   }
@@ -316,12 +316,12 @@ export const saveSet = ({ types, callback }) => async (
   });
 
   if (tag) {
-    await callback({ actionType: ActionTypes.CREATE, values: body });
+    await postProcessCb({ actionType: ActionTypes.CREATE, values: body });
   }
   return body;
 };
 
-export const deleteSets = ({ callback }) => async (
+export const deleteSets = ({ postProcessCb }) => async (
   obj,
   { setIds, userId },
   { es },
@@ -345,8 +345,8 @@ export const deleteSets = ({ callback }) => async (
     },
   });
 
-  if (isFunction(callback)) {
-    await callback({
+  if (isFunction(postProcessCb)) {
+    await postProcessCb({
       actionType: ActionTypes.DELETE,
       values: {
         userId: userId,
