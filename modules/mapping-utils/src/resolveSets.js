@@ -134,7 +134,7 @@ const addOrRemoveIds = async ({
   if (isFunction(postProcessCb)) {
     await postProcessCb({
       actionType: ActionTypes.UPDATE,
-      subAction: subAction,
+      subActionType: subAction,
       values: {
         userId: userId,
         ids: updatedIds,
