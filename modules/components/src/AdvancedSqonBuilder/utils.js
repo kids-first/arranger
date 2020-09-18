@@ -235,3 +235,22 @@ export const ActionContext = React.createContext({
     },
   },
 });
+
+export const isSetSqon = sqon => {
+  if (!sqon) return false;
+
+  return (
+    sqon.content.filter(c => (c?.content?.field || '') === 'setId').length > 0
+  );
+};
+
+export const cleanIfSetSqon = sqon => {
+  if (!isSetSqon(sqon)) {
+    return sqon;
+  } else {
+    return {
+      op: 'and',
+      content: sqon.content.filter(c => c.content.field === 'kf_id'),
+    };
+  }
+};
