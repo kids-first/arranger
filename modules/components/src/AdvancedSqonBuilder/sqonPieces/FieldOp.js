@@ -38,10 +38,14 @@ export default props => {
     FieldOpModifierContainer = undefined,
     api = defaultApi,
     getActiveExecutableSqon,
+    sqonDictionary,
   } = props;
 
   const fieldOpObj = getOperationAtPath(sqonPath)(fullSyntheticSqon);
-  const { op, content: { field, value } } = fieldOpObj;
+  const {
+    op,
+    content: { field, value },
+  } = fieldOpObj;
   const initialState = { isOpen: false };
   const onClickAway = s => () => {
     s.setState({ isOpen: false });
@@ -54,6 +58,9 @@ export default props => {
     onSqonChange(newSqon);
     toggleDropdown(s)();
   };
+
+  const formattedValue = formatDisplayValue(value);
+
   return (
     <Component initialState={initialState}>
       {s => (
@@ -64,11 +71,13 @@ export default props => {
                 <span className={`fieldName`}>
                   {fieldDisplayNameMap[field] || field}{' '}
                 </span>
-                <span className={`opName`}>{` is ${
-                  ((RANGE_OPS.includes(op) || TERM_OPS.includes(op)) && !(isEqual(value,["true"]) || isEqual(value,["false"])))
-                    ? opDisplayNameMap[op]
-                    : ''
-                } `}
+                <span className={`opName`}>
+                  {` is ${
+                    (RANGE_OPS.includes(op) || TERM_OPS.includes(op)) &&
+                    !(isEqual(value, ['true']) || isEqual(value, ['false']))
+                      ? opDisplayNameMap[op]
+                      : ''
+                  } `}
                 </span>
               </span>
               <ClickAwayListener
@@ -76,11 +85,8 @@ export default props => {
                 handler={onClickAway(s)}
               >
                 <span className={'valueDisplay'} onClick={toggleDropdown(s)}>
-                  <Tooltip
-                        position="bottom"
-                        html={formatDisplayValue(value)}
-                      >
-                    {formatDisplayValue(value)}{' '}
+                  <Tooltip position="bottom" html={formattedValue}>
+                    {formattedValue}{' '}
                   </Tooltip>
                 </span>
                 <span onClick={toggleDropdown(s)}>

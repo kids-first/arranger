@@ -236,21 +236,40 @@ export const ActionContext = React.createContext({
   },
 });
 
-export const isSetSqon = sqon => {
-  if (!sqon) return false;
-
-  return (
-    sqon.content.filter(c => (c?.content?.field || '') === 'setId').length > 0
-  );
-};
-
-export const cleanIfSetSqon = sqon => {
-  if (!isSetSqon(sqon)) {
-    return sqon;
-  } else {
-    return {
-      op: 'and',
-      content: sqon.content.filter(c => c.content.field === 'kf_id'),
-    };
-  }
+export const getSet = async (setId, arrangerProjectId, api) => {
+  const response = await api({
+    endpoint: `/${arrangerProjectId}/graphql`,
+    body: {
+      variables: {
+        sqon: {
+          op: 'and',
+          content: [
+            {
+              op: 'in',
+              content: {
+                field: 'setId',
+                value: setId,
+              },
+            },
+          ],
+        },
+      },
+      query: `
+        query($sqon: JSON) {
+              sets {
+                hits(filters: $sqon, first: 1) {
+                  edges {
+                    node {
+                      tag
+                      setId
+                      size
+                    }
+                  }
+                }
+              }
+            }
+      `,
+    },
+  });
+  return response.data.sets.hits.edges[0].node;
 };

@@ -13,8 +13,6 @@ import {
   isEmptySqon,
   AND_OP,
   OR_OP,
-  isSetSqon,
-  cleanIfSetSqon,
 } from './utils';
 import './style.css';
 import defaultApi from '../utils/api';
@@ -51,6 +49,7 @@ class AdvancedSqonBuilder extends Component {
     referenceColors: PropTypes.arrayOf(PropTypes.string),
     emptyEntryMessage: PropTypes.node,
     actionsProvider: PropTypes.object,
+    sqonDictionary: PropTypes.array,
   };
 
   static defaultProps = {
@@ -289,6 +288,7 @@ class AdvancedSqonBuilder extends Component {
       ResultCountIcon,
       resultCountIconProps,
       actionsProvider,
+      sqonDictionary,
     } = this.props;
 
     const selectedSyntheticSqon = syntheticSqons[currentActiveSqonIndex];
@@ -348,7 +348,7 @@ class AdvancedSqonBuilder extends Component {
                   api={api}
                   arrangerProjectId={arrangerProjectId}
                   arrangerProjectIndex={arrangerProjectIndex}
-                  syntheticSqon={cleanIfSetSqon(sq)}
+                  syntheticSqon={sq}
                   isActiveSqon={i === currentActiveSqonIndex}
                   isSelected={this.state.selectedSqonIndices.includes(i)}
                   isReferenced={isSqonReferenced(i)}
@@ -375,7 +375,7 @@ class AdvancedSqonBuilder extends Component {
                   syntheticSqons={syntheticSqons}
                   ResultCountIcon={ResultCountIcon}
                   resultCountIconProps={resultCountIconProps}
-                  isSetSqon={isSetSqon(sq)}
+                  sqonDictionary={sqonDictionary}
                 />
               );
             })}

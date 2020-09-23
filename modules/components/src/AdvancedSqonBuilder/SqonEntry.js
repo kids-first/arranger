@@ -82,6 +82,7 @@ export default class SqonEntry extends Component {
       ResultCountIcon = () => {},
       resultCountIconProps = {},
       forceFetch,
+      sqonDictionary = [],
     } = this.props;
 
     const referenceColor = getColorForReference(index);
@@ -141,6 +142,7 @@ export default class SqonEntry extends Component {
                           getColorForReference={getColorForReference}
                           isIndexReferenced={isIndexReferenced}
                           referencesShouldHighlight={isActiveSqon}
+                          sqonDictionary={sqonDictionary}
                         />
                       )}
                 </div>
@@ -155,9 +157,7 @@ export default class SqonEntry extends Component {
                 className="resultCountIcon"
                 {...resultCountIconProps}
               />
-              {loading
-                ? '...'
-                : get(data, 'participant.hits.total', 0)}
+              {loading ? '...' : get(data, 'participant.hits.total', 0)}
             </div>
             <div className="actionButtonsContainer">
               <button

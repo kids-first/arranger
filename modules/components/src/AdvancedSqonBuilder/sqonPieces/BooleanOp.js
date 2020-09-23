@@ -99,6 +99,7 @@ const BooleanOp = props => {
     getColorForReference = () => '',
     isIndexReferenced = () => false,
     referencesShouldHighlight = false,
+    sqonDictionary = [],
   } = props;
   const { op, content } = sqon;
   const onOpChange = newOpName =>
@@ -137,6 +138,7 @@ const BooleanOp = props => {
                   FieldOpModifierContainer={FieldOpModifierContainer}
                   api={api}
                   getActiveExecutableSqon={getActiveExecutableSqon}
+                  sqonDictionary={sqonDictionary}
                 />
               </span>
             ) : isReference(c) ? (
