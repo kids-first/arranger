@@ -20,7 +20,6 @@ import isEqual from 'lodash/isEqual';
 import internalTranslateSQONValue from '../../utils/translateSQONValue';
 
 const translateIfSet = (value, dictionary) => {
-  console.log(value, 'value');
   const foundInDict = dictionary.find(
     s => s.setId === value.replace('set_id:', ''),
   );
@@ -38,6 +37,8 @@ const formatDisplayValue = (raw, dictionary = []) => {
 
   return internalTranslateSQONValue(translateIfSet(raw, dictionary));
 };
+
+const setRegex = new RegExp('^set_id:.+');
 
 export default props => {
   const {
@@ -74,6 +75,8 @@ export default props => {
 
   const formattedValue = formatDisplayValue(value, sqonDictionary);
 
+  const isSetSqon = setRegex.test(value);
+
   return (
     <Component initialState={initialState}>
       {s => (
@@ -102,12 +105,15 @@ export default props => {
                     {formattedValue}{' '}
                   </Tooltip>
                 </span>
-                <span onClick={toggleDropdown(s)}>
-                  <span style={{ pointerEvents: 'none' }}>
-                    {s.state.isOpen ? <FaChevronUp /> : <FaChevronDown />}
+                {!isSetSqon && (
+                  <span onClick={toggleDropdown(s)}>
+                    <span style={{ pointerEvents: 'none' }}>
+                      {s.state.isOpen ? <FaChevronUp /> : <FaChevronDown />}
+                    </span>
                   </span>
-                </span>
-                {s.state.isOpen && (
+                )}
+
+                {s.state.isOpen && !isSetSqon && (
                   <div className={`fieldFilterContainer`}>
                     <FieldOpModifier
                       arrangerProjectId={arrangerProjectId}
