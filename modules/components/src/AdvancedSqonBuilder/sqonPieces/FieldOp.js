@@ -19,11 +19,24 @@ import { Tooltip } from 'react-tippy';
 import isEqual from 'lodash/isEqual';
 import internalTranslateSQONValue from '../../utils/translateSQONValue';
 
-const formatDisplayValue = raw => {
+const translateIfSet = (value, dictionary) => {
+  console.log(value, 'value');
+  const foundInDict = dictionary.find(
+    s => s.setId === value.replace('set_id:', ''),
+  );
+  return foundInDict ? foundInDict.tag : value;
+};
+
+const formatDisplayValue = (raw, dictionary = []) => {
   if (Array.isArray(raw)) {
-    return raw.map(v => internalTranslateSQONValue(v)).join(',');
+    return raw
+      .map(v => {
+        return internalTranslateSQONValue(translateIfSet(v, dictionary));
+      })
+      .join(',');
   }
-  return internalTranslateSQONValue(raw);
+
+  return internalTranslateSQONValue(translateIfSet(raw, dictionary));
 };
 
 export default props => {
@@ -59,7 +72,7 @@ export default props => {
     toggleDropdown(s)();
   };
 
-  const formattedValue = formatDisplayValue(value);
+  const formattedValue = formatDisplayValue(value, sqonDictionary);
 
   return (
     <Component initialState={initialState}>
