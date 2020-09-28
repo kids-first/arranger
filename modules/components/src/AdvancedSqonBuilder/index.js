@@ -340,45 +340,43 @@ class AdvancedSqonBuilder extends Component {
                 </ButtonComponent>
               </div>
             </div>
-            {syntheticSqons.map((sq, i) => {
-              return (
-                <SqonEntry
-                  key={`${i}-${generateSqonKey(sq)}`}
-                  index={i}
-                  api={api}
-                  arrangerProjectId={arrangerProjectId}
-                  arrangerProjectIndex={arrangerProjectIndex}
-                  syntheticSqon={sq}
-                  isActiveSqon={i === currentActiveSqonIndex}
-                  isSelected={this.state.selectedSqonIndices.includes(i)}
-                  isReferenced={isSqonReferenced(i)}
-                  isIndexReferenced={isIndexReferencedInSqon(
-                    selectedSyntheticSqon,
-                  )}
-                  isDeleting={this.state.deletingIndex === i}
-                  disabled={isEmptySqon(sq)}
-                  SqonActionComponent={SqonActionComponent}
-                  FieldOpModifierContainer={FieldOpModifierContainer}
-                  getActiveExecutableSqon={getActiveExecutableSqon}
-                  getColorForReference={getColorForReference}
-                  dependentIndices={getDependentIndices(syntheticSqons)(i)}
-                  onSqonChange={this.onSqonChange(i)}
-                  onSqonCheckedChange={this.onSelectedSqonIndicesChange(i)}
-                  onSqonDuplicate={this.onSqonDuplicate(i)}
-                  onSqonRemove={this.onSqonRemove(i)}
-                  onActivate={onSqonEntryActivate(i)}
-                  onDeleteConfirmed={
-                    this.state.onSqonDeleteConfirmed || (() => {})
-                  }
-                  onDeleteCanceled={this.state.onSqonDeleteCancel || (() => {})}
-                  emptyEntryMessage={emptyEntryMessage}
-                  syntheticSqons={syntheticSqons}
-                  ResultCountIcon={ResultCountIcon}
-                  resultCountIconProps={resultCountIconProps}
-                  sqonDictionary={sqonDictionary}
-                />
-              );
-            })}
+            {syntheticSqons.map((sq, i) => (
+              <SqonEntry
+                key={`${i}-${generateSqonKey(sq)}`}
+                index={i}
+                api={api}
+                arrangerProjectId={arrangerProjectId}
+                arrangerProjectIndex={arrangerProjectIndex}
+                syntheticSqon={sq}
+                isActiveSqon={i === currentActiveSqonIndex}
+                isSelected={this.state.selectedSqonIndices.includes(i)}
+                isReferenced={isSqonReferenced(i)}
+                isIndexReferenced={isIndexReferencedInSqon(
+                  selectedSyntheticSqon,
+                )}
+                isDeleting={this.state.deletingIndex === i}
+                disabled={isEmptySqon(sq)}
+                SqonActionComponent={SqonActionComponent}
+                FieldOpModifierContainer={FieldOpModifierContainer}
+                getActiveExecutableSqon={getActiveExecutableSqon}
+                getColorForReference={getColorForReference}
+                dependentIndices={getDependentIndices(syntheticSqons)(i)}
+                onSqonChange={this.onSqonChange(i)}
+                onSqonCheckedChange={this.onSelectedSqonIndicesChange(i)}
+                onSqonDuplicate={this.onSqonDuplicate(i)}
+                onSqonRemove={this.onSqonRemove(i)}
+                onActivate={onSqonEntryActivate(i)}
+                onDeleteConfirmed={
+                  this.state.onSqonDeleteConfirmed || (() => {})
+                }
+                onDeleteCanceled={this.state.onSqonDeleteCancel || (() => {})}
+                emptyEntryMessage={emptyEntryMessage}
+                syntheticSqons={syntheticSqons}
+                ResultCountIcon={ResultCountIcon}
+                resultCountIconProps={resultCountIconProps}
+                sqonDictionary={sqonDictionary}
+              />
+            ))}
             <div>
               <button
                 className={`sqonListActionButton removeButton`}

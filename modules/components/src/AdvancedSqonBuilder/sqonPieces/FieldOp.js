@@ -79,64 +79,67 @@ export default props => {
 
   return (
     <Component initialState={initialState}>
-      {s => (
-        <DisplayNameMapContext.Consumer>
-          {(fieldDisplayNameMap = {}) => (
-            <span className={`fieldOp pill`}>
-              <span className={'opContainer'}>
-                <span className={`fieldName`}>
-                  {fieldDisplayNameMap[field] || field}{' '}
-                </span>
-                <span className={`opName`}>
-                  {` is ${
-                    (RANGE_OPS.includes(op) || TERM_OPS.includes(op)) &&
-                    !(isEqual(value, ['true']) || isEqual(value, ['false']))
-                      ? opDisplayNameMap[op]
-                      : ''
-                  } `}
-                </span>
-              </span>
-              <ClickAwayListener
-                className={'selectionContainer'}
-                handler={onClickAway(s)}
-              >
-                <span className={'valueDisplay'} onClick={toggleDropdown(s)}>
-                  <Tooltip position="bottom" html={formattedValue}>
-                    {formattedValue}{' '}
-                  </Tooltip>
-                </span>
-                {!isSetSqon && (
-                  <span onClick={toggleDropdown(s)}>
-                    <span style={{ pointerEvents: 'none' }}>
-                      {s.state.isOpen ? <FaChevronUp /> : <FaChevronDown />}
-                    </span>
+      {s => {
+        const { isOpen } = s.state;
+        return (
+          <DisplayNameMapContext.Consumer>
+            {(fieldDisplayNameMap = {}) => (
+              <span className={`fieldOp pill`}>
+                <span className={'opContainer'}>
+                  <span className={`fieldName`}>
+                    {fieldDisplayNameMap[field] || field}{' '}
                   </span>
-                )}
+                  <span className={`opName`}>
+                    {` is ${
+                      (RANGE_OPS.includes(op) || TERM_OPS.includes(op)) &&
+                      !(isEqual(value, ['true']) || isEqual(value, ['false']))
+                        ? opDisplayNameMap[op]
+                        : ''
+                    } `}
+                  </span>
+                </span>
+                <ClickAwayListener
+                  className={'selectionContainer'}
+                  handler={onClickAway(s)}
+                >
+                  <span className={'valueDisplay'} onClick={toggleDropdown(s)}>
+                    <Tooltip position="bottom" html={formattedValue}>
+                      {formattedValue}{' '}
+                    </Tooltip>
+                  </span>
+                  {!isSetSqon && (
+                    <span onClick={toggleDropdown(s)}>
+                      <span style={{ pointerEvents: 'none' }}>
+                        {isOpen ? <FaChevronUp /> : <FaChevronDown />}
+                      </span>
+                    </span>
+                  )}
 
-                {s.state.isOpen && !isSetSqon && (
-                  <div className={`fieldFilterContainer`}>
-                    <FieldOpModifier
-                      arrangerProjectId={arrangerProjectId}
-                      arrangerProjectIndex={arrangerProjectIndex}
-                      field={field}
-                      sqonPath={sqonPath}
-                      initialSqon={fullSyntheticSqon}
-                      onSubmit={onNewSqonSubmitted(s)}
-                      onCancel={toggleDropdown(s)}
-                      fieldDisplayNameMap={fieldDisplayNameMap}
-                      opDisplayNameMap={opDisplayNameMap}
-                      ContainerComponent={FieldOpModifierContainer}
-                      getExecutableSqon={getActiveExecutableSqon}
-                      api={api}
-                    />
-                  </div>
-                )}
-              </ClickAwayListener>
-              <PillRemoveButton onClick={onRemoveClick} />
-            </span>
-          )}
-        </DisplayNameMapContext.Consumer>
-      )}
+                  {isOpen && !isSetSqon && (
+                    <div className={`fieldFilterContainer`}>
+                      <FieldOpModifier
+                        arrangerProjectId={arrangerProjectId}
+                        arrangerProjectIndex={arrangerProjectIndex}
+                        field={field}
+                        sqonPath={sqonPath}
+                        initialSqon={fullSyntheticSqon}
+                        onSubmit={onNewSqonSubmitted(s)}
+                        onCancel={toggleDropdown(s)}
+                        fieldDisplayNameMap={fieldDisplayNameMap}
+                        opDisplayNameMap={opDisplayNameMap}
+                        ContainerComponent={FieldOpModifierContainer}
+                        getExecutableSqon={getActiveExecutableSqon}
+                        api={api}
+                      />
+                    </div>
+                  )}
+                </ClickAwayListener>
+                <PillRemoveButton onClick={onRemoveClick} />
+              </span>
+            )}
+          </DisplayNameMapContext.Consumer>
+        );
+      }}
     </Component>
   );
 };
