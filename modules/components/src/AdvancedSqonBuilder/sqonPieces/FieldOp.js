@@ -20,9 +20,14 @@ import isEqual from 'lodash/isEqual';
 import internalTranslateSQONValue from '../../utils/translateSQONValue';
 
 const translateIfSet = (value, dictionary) => {
+  if (typeof value !== 'string' || !value.startsWith('set_id:')) {
+    return value;
+  }
+
   const foundInDict = dictionary.find(
     s => s.setId === value.replace('set_id:', ''),
   );
+
   return foundInDict ? foundInDict.tag : value;
 };
 
