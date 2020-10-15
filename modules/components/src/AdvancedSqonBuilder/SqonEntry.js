@@ -83,6 +83,7 @@ export default class SqonEntry extends Component {
       resultCountIconProps = {},
       forceFetch,
       sqonDictionary = [],
+      customQuery,
     } = this.props;
 
     const referenceColor = getColorForReference(index);
@@ -143,6 +144,7 @@ export default class SqonEntry extends Component {
                           isIndexReferenced={isIndexReferenced}
                           referencesShouldHighlight={isActiveSqon}
                           sqonDictionary={sqonDictionary}
+                          customQuery={customQuery}
                         />
                       )}
                 </div>

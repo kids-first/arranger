@@ -39,6 +39,7 @@ export class TermFilterUI extends React.Component {
     sqonPath: [],
     fieldDisplayNameMap: {},
     opDisplayNameMap: FIELD_OP_DISPLAY_NAME,
+    sqonDictionary: [],
   };
 
   state = {
@@ -164,6 +165,7 @@ export class TermFilterUI extends React.Component {
       buckets,
       fieldDisplayNameMap,
       opDisplayNameMap,
+      sqonDictionary,
     } = this.props;
 
     const computedBuckets = this.computeBuckets(buckets);
@@ -238,6 +240,7 @@ export class TermFilterUI extends React.Component {
             handleValueClick={this.onFilterClick}
             isActive={this.isFilterActive}
             maxTerms={5}
+            sqonDictionary={sqonDictionary}
           />
         </div>
       </ContainerComponent>
@@ -263,10 +266,21 @@ export default props => {
     sqonPath = [],
     fieldDisplayNameMap = {},
     opDisplayNameMap = FIELD_OP_DISPLAY_NAME,
+    sqonDictionary,
+    customQuery,
   } = props;
 
   const gqlField = field.split('.').join('__');
-  const query = `query($sqon: JSON){
+
+  const isSet = executableSqon.content.some(
+    s =>
+      s.content.value.some(t => t.startsWith('set_id:')) && field === 'kf_id', //TODO
+  );
+
+  const query =
+    isSet && customQuery
+      ? customQuery.body
+      : `query($sqon: JSON){
     ${arrangerProjectIndex} {
       aggregations(filters: $sqon) {
         ${gqlField} {
@@ -278,9 +292,29 @@ export default props => {
       }
     }
   }`;
+
+  const getBuckets = rawData => {
+    if (!rawData) return [];
+    if (isSet && customQuery) {
+      return customQuery.mapResultData(rawData) || [];
+    }
+    return (
+      get(
+        rawData,
+        `${arrangerProjectIndex}.aggregations.${gqlField}.buckets`,
+      ) || []
+    );
+  };
+
   return (
     <Query
-      variables={{ sqon: executableSqon }}
+      variables={
+        isSet && customQuery
+          ? {
+              sqon: customQuery.variables,
+            }
+          : { sqon: executableSqon }
+      }
       projectId={arrangerProjectId}
       api={api}
       query={query}
@@ -299,14 +333,8 @@ export default props => {
           sqonPath={sqonPath}
           fieldDisplayNameMap={fieldDisplayNameMap}
           opDisplayNameMap={opDisplayNameMap}
-          buckets={
-            data
-              ? get(
-                  data,
-                  `${arrangerProjectIndex}.aggregations.${gqlField}.buckets`,
-                )
-              : []
-          }
+          buckets={getBuckets(data)}
+          sqonDictionary={sqonDictionary}
         />
       )}
     />

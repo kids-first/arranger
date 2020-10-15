@@ -93,7 +93,9 @@ export const RangeFilterUi = props => {
     const max = toOriginalUnit(s.state.maxValue);
     const value = [GTE_OP, GT_OP].includes(op)
       ? [min]
-      : [LTE_OP, LT_OP].includes(op) ? [max] : [min, max];
+      : [LTE_OP, LT_OP].includes(op)
+      ? [max]
+      : [min, max];
 
     const sqonToSubmit = {
       op,
@@ -150,13 +152,12 @@ export const RangeFilterUi = props => {
           <div className="filterContent">
             <div className="contentSection">
               <span>{fieldDisplayNameMap[field] || field}</span> is{' '}
-              <select onChange={onOptionTypeChange(s)}>
+              <select
+                onChange={onOptionTypeChange(s)}
+                defaultValue={s.state.selectedOperation}
+              >
                 {RANGE_OPS.map(option => (
-                  <option
-                    key={option}
-                    value={option}
-                    selected={s.state.selectedOperation === option}
-                  >
+                  <option key={option} value={option}>
                     {opDisplayNameMap[option]}
                   </option>
                 ))}

@@ -100,6 +100,7 @@ const BooleanOp = props => {
     isIndexReferenced = () => false,
     referencesShouldHighlight = false,
     sqonDictionary = [],
+    customQuery
   } = props;
   const { op, content } = sqon;
   const onOpChange = newOpName =>
@@ -139,6 +140,7 @@ const BooleanOp = props => {
                   api={api}
                   getActiveExecutableSqon={getActiveExecutableSqon}
                   sqonDictionary={sqonDictionary}
+                  customQuery={customQuery}
                 />
               </span>
             ) : isReference(c) ? (
