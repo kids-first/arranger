@@ -11,6 +11,7 @@ import {
   IN_OP,
   AND_OP,
   ActionContext,
+  includesSqonSet,
 } from '../utils';
 import TermAgg from '../../Aggs/TermAgg';
 import TextFilter from '../../TextFilter';
@@ -272,13 +273,13 @@ export default props => {
 
   const gqlField = field.split('.').join('__');
 
-  const isSet = executableSqon.content.some(
-    s =>
-      s.content.value.some(t => t.startsWith('set_id:')) && field === 'kf_id', //TODO
-  );
+  const isCurrentFieldSet =
+    includesSqonSet(executableSqon) && field === 'kf_id';
+
+  const shouldSetTermFilter = isCurrentFieldSet && customQuery;
 
   const query =
-    isSet && customQuery
+      shouldSetTermFilter
       ? customQuery.body
       : `query($sqon: JSON){
     ${arrangerProjectIndex} {
@@ -294,8 +295,10 @@ export default props => {
   }`;
 
   const getBuckets = rawData => {
-    if (!rawData) return [];
-    if (isSet && customQuery) {
+    if (!rawData) {
+      return [];
+    }
+    if (shouldSetTermFilter) {
       return customQuery.mapResultData(rawData) || [];
     }
     return (
@@ -309,7 +312,7 @@ export default props => {
   return (
     <Query
       variables={
-        isSet && customQuery
+        shouldSetTermFilter
           ? {
               sqon: customQuery.variables,
             }

@@ -150,10 +150,14 @@ const TermAgg = ({
   const fieldDisplayName = displayName || headerTitle;
 
   const translateValue = value => {
-    if (typeof value !== 'string' || !sqonDictionary) return value;
+    if (typeof value !== 'string' || !sqonDictionary) {
+      return value;
+    }
     const cleanIfSet = value.replace('set_id:', '');
     const setTranslate = sqonDictionary.find(s => s.setId === cleanIfSet);
-    if (setTranslate) return setTranslate.tag;
+    if (setTranslate) {
+      return setTranslate.tag;
+    }
     return value;
   };
   return (
