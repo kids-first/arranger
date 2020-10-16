@@ -40,6 +40,12 @@ const mockTermBuckets = [
   { doc_count: 10, key: 'oisheglsknvd' },
 ];
 
+const mockSetsTermBuckets = [
+  { doc_count: 1990, key: 'set_id:12345' },
+  { doc_count: 20, key: 'set_id:33333' },
+  { doc_count: 42, key: 'set_id:54321' },
+];
+
 const mockBooleanBuckets = [
   {
     key: '0',
@@ -254,4 +260,81 @@ storiesOf('AdvancedSqonBuilder', module)
         fieldDisplayNameMap={mockFieldDisplayMap}
       />
     );
-  });
+  })
+  .add('BuilderWithSets', () => {
+    const initialState = {
+      activeSqonIndex: 0,
+      ModalComponent: null,
+      syntheticSqons: mockSqons,
+    };
+    const onChange = s => data => {
+      action('sqons change')(data);
+      s.setState({ syntheticSqons: data.newSyntheticSqons });
+    };
+    const onActiveSqonSelect = s => ({ index, sqonValue }) => {
+      action('active sqon select')({ index, sqonValue });
+      s.setState({ activeSqonIndex: index });
+    };
+    const setModal = s => ModalComponent =>
+      s.setState({
+        ModalComponent,
+      });
+    return (
+      <ProjectsProvider>
+        {({ project, index }) => (
+          <Component initialState={initialState}>
+            {s => (
+              <div style={{ position: 'relative', height: '100%' }}>
+                <AdvancedSqonBuilder
+                  arrangerProjectId={project}
+                  arrangerProjectIndex={index}
+                  syntheticSqons={s.state.syntheticSqons}
+                  activeSqonIndex={s.state.activeSqonIndex}
+                  fieldDisplayNameMap={mockFieldDisplayMap}
+                  emptyEntryMessage={'Custom empty sqon message'}
+                  onChange={onChange(s)}
+                  onActiveSqonSelect={onActiveSqonSelect(s)}
+                  getSqonDeleteConfirmation={({
+                    indexToRemove,
+                    dependentIndices,
+                  }) =>
+                    new Promise((resolve, reject) => {
+                      setModal(s)(() => (
+                        <DemoModal
+                          onOk={() => {
+                            setModal(s)(null);
+                            resolve();
+                          }}
+                          onCancel={() => {
+                            setModal(s)(null);
+                            reject();
+                          }}
+                        />
+                      ));
+                    })
+                  }
+                  SqonActionComponent={DemoSqonActionComponent}
+                />
+                {s.state.ModalComponent ? s.state.ModalComponent() : null}
+              </div>
+            )}
+          </Component>
+        )}
+      </ProjectsProvider>
+    );
+  })
+  .add('filters/TermFilterWithSets', () => (
+    <TermFilterUI
+      buckets={mockSetsTermBuckets}
+      initialSqon={mockSqons[6]}
+      sqonPath={[0]}
+      fieldDisplayNameMap={mockFieldDisplayMap}
+      onSubmit={action('submitted')}
+      onCancel={action('canceled')}
+      sqonDictionary={[
+        { setId: '12345', tag: 'set_one' },
+        { setId: '33333', tag: 'set_two' },
+        { setId: '54321', tag: 'set_three' },
+      ]}
+    />
+  ));

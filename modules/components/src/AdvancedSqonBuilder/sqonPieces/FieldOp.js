@@ -43,8 +43,6 @@ const formatDisplayValue = (raw, dictionary = []) => {
   return internalTranslateSQONValue(translateIfSet(raw, dictionary));
 };
 
-const setRegex = new RegExp('^set_id:.+');
-
 export default props => {
   const {
     onSqonChange = fullSqon => {},
@@ -58,6 +56,7 @@ export default props => {
     api = defaultApi,
     getActiveExecutableSqon,
     sqonDictionary,
+    customQuery,
   } = props;
 
   const fieldOpObj = getOperationAtPath(sqonPath)(fullSyntheticSqon);
@@ -79,8 +78,6 @@ export default props => {
   };
 
   const formattedValue = formatDisplayValue(value, sqonDictionary);
-
-  const isSetSqon = setRegex.test(value);
 
   return (
     <Component initialState={initialState}>
@@ -112,15 +109,13 @@ export default props => {
                       {formattedValue}{' '}
                     </Tooltip>
                   </span>
-                  {!isSetSqon && (
-                    <span onClick={toggleDropdown(s)}>
-                      <span style={{ pointerEvents: 'none' }}>
-                        {isOpen ? <FaChevronUp /> : <FaChevronDown />}
-                      </span>
+                  <span onClick={toggleDropdown(s)}>
+                    <span style={{ pointerEvents: 'none' }}>
+                      {isOpen ? <FaChevronUp /> : <FaChevronDown />}
                     </span>
-                  )}
+                  </span>
 
-                  {isOpen && !isSetSqon && (
+                  {isOpen && (
                     <div className={`fieldFilterContainer`}>
                       <FieldOpModifier
                         arrangerProjectId={arrangerProjectId}
@@ -135,6 +130,8 @@ export default props => {
                         ContainerComponent={FieldOpModifierContainer}
                         getExecutableSqon={getActiveExecutableSqon}
                         api={api}
+                        sqonDictionary={sqonDictionary}
+                        customQuery={customQuery}
                       />
                     </div>
                   )}

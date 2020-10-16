@@ -136,6 +136,7 @@ const TermAgg = ({
   searchText,
   setSearchText,
   InputComponent = Input,
+  sqonDictionary,
 }) => {
   const decoratedBuckets = decorateBuckets({ buckets, searchText });
   const dotField = field.replace(/__/g, '.');
@@ -147,6 +148,18 @@ const TermAgg = ({
   const isMoreEnabled = decoratedBuckets.length > maxTerms;
   const isEmpty = decoratedBuckets.length === 0;
   const fieldDisplayName = displayName || headerTitle;
+
+  const translateValue = value => {
+    if (typeof value !== 'string' || !sqonDictionary) {
+      return value;
+    }
+    const cleanIfSet = value.replace('set_id:', '');
+    const setTranslate = sqonDictionary.find(s => s.setId === cleanIfSet);
+    if (setTranslate) {
+      return setTranslate.tag;
+    }
+    return value;
+  };
   return (
     <AggsWrapper
       componentRef={aggWrapperRef}
@@ -251,9 +264,14 @@ const TermAgg = ({
                     />
                     <TextHighlight
                       content={
-                        truncate(internalTranslateSQONValue(bucket.name), {
-                          length: valueCharacterLimit || Infinity,
-                        }) + ' '
+                        truncate(
+                          internalTranslateSQONValue(
+                            translateValue(bucket.name),
+                          ),
+                          {
+                            length: valueCharacterLimit || Infinity,
+                          },
+                        ) + ' '
                       }
                       highlightText={highlightText}
                     />

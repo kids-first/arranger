@@ -50,6 +50,7 @@ class AdvancedSqonBuilder extends Component {
     emptyEntryMessage: PropTypes.node,
     actionsProvider: PropTypes.object,
     sqonDictionary: PropTypes.array,
+    customQuery: PropTypes.object,
   };
 
   static defaultProps = {
@@ -289,6 +290,7 @@ class AdvancedSqonBuilder extends Component {
       resultCountIconProps,
       actionsProvider,
       sqonDictionary,
+      customQuery,
     } = this.props;
 
     const selectedSyntheticSqon = syntheticSqons[currentActiveSqonIndex];
@@ -375,6 +377,7 @@ class AdvancedSqonBuilder extends Component {
                 ResultCountIcon={ResultCountIcon}
                 resultCountIconProps={resultCountIconProps}
                 sqonDictionary={sqonDictionary}
+                customQuery={customQuery}
               />
             ))}
             <div>

@@ -235,3 +235,14 @@ export const ActionContext = React.createContext({
     },
   },
 });
+
+export const includesSqonSet = sqon => {
+  return (
+    !!sqon &&
+    (sqon?.content || []).some(s =>
+      Array.isArray(s.content.value)
+        ? s.content.value.some(t => t.startsWith('set_id:'))
+        : s.content.value.startsWith('set_id:'),
+    )
+  );
+};

@@ -115,6 +115,41 @@ export const sqons = [
       },
     ],
   },
+  {
+    op: 'or',
+    content: [
+      {
+        op: 'in',
+        content: {
+          field: 'diagnoses.diagnosis_category',
+          value: ['Cancer', 'Acute Myeloid Leukemia'],
+        },
+      },
+      {
+        op: 'in',
+        content: {
+          field: 'study.short_name',
+          value: [
+            'Ewing Sarcoma: Genetic Risk',
+            'Pediatric Brain Tumors: CBTTC',
+            'Acute Myeloid Leukemia',
+          ],
+        },
+      },
+    ],
+  },
+  {
+    op: 'and',
+    content: [
+      {
+        op: 'in',
+        content: {
+          field: 'kf_id',
+          value: ['set_id:54321'],
+        },
+      },
+    ],
+  },
 ];
 
 export const fieldDisplayMap = {

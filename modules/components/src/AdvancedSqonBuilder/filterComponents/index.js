@@ -25,6 +25,8 @@ const FieldOpModifier = ({
   arrangerProjectId = PROJECT_ID,
   arrangerProjectIndex,
   getExecutableSqon = () => initialSqon,
+  sqonDictionary,
+  customQuery,
 }) => (
   <ExtendedMappingProvider
     api={api}
@@ -54,6 +56,8 @@ const FieldOpModifier = ({
           fieldDisplayNameMap={fieldDisplayNameMap}
           opDisplayNameMap={opDisplayNameMap}
           ContainerComponent={ContainerComponent}
+          sqonDictionary={sqonDictionary}
+          customQuery={customQuery}
         />
       ) : ['long', 'float', 'integer', 'date'].includes(type) ? (
         <RangeFilter
