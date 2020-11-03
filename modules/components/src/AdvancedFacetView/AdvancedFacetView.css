@@ -131,3 +131,7 @@
 .facetViewWrapper .facetContainer .content {
   padding: 10px;
 }
+
+.input-show-only-fields-with-value {
+  margin-right: 5px;
+}

@@ -120,6 +120,7 @@ export default class AdvancedFacetView extends React.Component {
       onTermSelected,
       onClear,
       InputComponent = TextInput,
+      pathValidator,
       ...props
     } = this.props;
     const scrollFacetViewToPath = path => {
@@ -172,6 +173,8 @@ export default class AdvancedFacetView extends React.Component {
                         type="checkBox"
                         checked={withValueOnly}
                         aria-label={`Show only fields with value`}
+                        className={'input-show-only-fields-with-value'}
+                        readOnly
                       />
                       Show only fields with value
                     </span>
@@ -202,17 +205,6 @@ export default class AdvancedFacetView extends React.Component {
                       <InputComponent
                         icon={<FaFilter />}
                         aria-label={`Data filter`}
-                        rightIcon={
-                          <FaTimesCircleO
-                            onClick={() => {
-                              setState({ value: null }, () => {
-                                this.setState({
-                                  searchTerm: null,
-                                });
-                              });
-                            }}
-                          />
-                        }
                         className="filterInput"
                         type="text"
                         placeholder="Filter"
@@ -261,6 +253,7 @@ export default class AdvancedFacetView extends React.Component {
                       searchTerm: searchTerm,
                     })}
                     onTermSelected={onTermSelected}
+                    pathValidator={pathValidator}
                   />
                 </div>
               </div>

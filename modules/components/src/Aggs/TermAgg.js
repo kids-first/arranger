@@ -1,6 +1,5 @@
 import React from 'react';
 import { compose, withState } from 'recompose';
-import isEmpty from 'lodash/isEmpty';
 import truncate from 'lodash/truncate';
 import DefaultSearchIcon from 'react-icons/lib/fa/search';
 import { css } from 'emotion';
@@ -103,7 +102,6 @@ const TermAgg = ({
   handleValueClick = () => {},
   isActive = () => {},
   Content = 'div',
-  SearchIcon = DefaultSearchIcon,
   maxTerms = 5,
   collapsible = true,
   isExclude: externalIsExclude = () => {},
@@ -111,7 +109,6 @@ const TermAgg = ({
   handleIncludeExcludeChange = () => {},
   constructEntryId = ({ value }) => value,
   valueCharacterLimit,
-  observableValueInFocus = null,
   WrapperComponent,
   highlightText,
   constructBucketItemClassName = () => '',
@@ -236,10 +233,6 @@ const TermAgg = ({
                     showingBuckets: array,
                     showingMore,
                   }) || ''}`}
-                  content={{
-                    field: dotField,
-                    value: bucket.name,
-                  }}
                   onClick={() =>
                     handleValueClick({
                       field: dotField,

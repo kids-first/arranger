@@ -15,6 +15,7 @@ export default class extends React.Component {
       highlightText,
       highlightClassName = css`
         background: #f7ed9c;
+        margin-left: 5px;
       `,
     } = this.props;
     const regex = strToReg(highlightText, { modifiers: 'i' });
