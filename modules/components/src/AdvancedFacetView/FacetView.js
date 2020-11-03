@@ -53,95 +53,103 @@ export default class FacetView extends React.Component {
       extendedMapping,
       searchString,
       onTermSelected,
+      pathValidator = _ => true,
     } = this.props;
     return (
       <div className="facetView" ref={el => (this.root = el)}>
-        {flattenDisplayTreeData(displayTreeData).map(({ path }) => {
-          const metaData = extendedMapping.find(({ field }) => field === path);
-          const { type } = metaData || {};
-          const paths = path
-            .split('.')
-            .reduce(
-              (acc, node, i, paths) => [
-                ...acc,
-                [...paths.slice(0, i), node].join('.'),
-              ],
-              [],
+        {flattenDisplayTreeData(displayTreeData)
+          .filter(({ path }) => pathValidator(path))
+          .map(({ path }) => {
+            const metaData = extendedMapping.find(
+              ({ field }) => field === path,
             );
-          const pathDisplayNames = paths.map(
-            path =>
-              extendedMapping.find(({ field }) => field === path)?.displayName,
-          );
-          const agg = aggregations[path];
-          return aggComponentsMap[type]?.({
-            ...metaData,
-            ...agg,
-            ...(type === 'keyword'
-              ? (() => {
-                  const columns = 4;
-                  const maxTerms = columns * 2;
-                  return {
-                    maxTerms,
-                    constructBucketItemClassName: ({
-                      bucket,
-                      showingBuckets,
-                      i,
-                      showingMore,
-                    }) =>
-                      `row_${Math.floor(i / columns)} col_${i % columns} ${
-                        Math.floor(i / columns) ===
-                        Math.floor((showingBuckets.length - 1) / columns)
-                          ? 'last_row'
-                          : ''
-                      } ${showingBuckets.length <= columns ? 'only_row' : ''}`,
-                  };
-                })()
-              : {}),
-            key: path,
-            field: path,
-            getRangeAggProps: () => {
-              return {
-                step: metaData.rangeStep,
-              };
-            },
-            onValueChange: ({ sqon, value }) => {
-              this.setState(
-                {
-                  focusedPath: path,
-                },
-                () => {
-                  onValueChange({ sqon, value });
-                  onTermSelected?.(value);
-                },
+            const { type } = metaData || {};
+            const paths = path
+              .split('.')
+              .reduce(
+                (acc, node, i, paths) => [
+                  ...acc,
+                  [...paths.slice(0, i), node].join('.'),
+                ],
+                [],
               );
-            },
-            highlightText: searchString,
-            sqon,
-            facetView: true,
-            WrapperComponent: ({ displayName, collapsible, children }) => (
-              <div id={serializeToDomId(path)} className={`facetContainer`}>
-                <div className={`header`}>
-                  <div className={`title`}>
-                    <TextHighlight
-                      content={displayName}
-                      highlightText={searchString}
-                    />
+            const pathDisplayNames = paths.map(
+              path =>
+                extendedMapping.find(({ field }) => field === path)
+                  ?.displayName,
+            );
+            const agg = aggregations[path];
+            return aggComponentsMap[type]?.({
+              ...metaData,
+              ...agg,
+              ...(type === 'keyword'
+                ? (() => {
+                    const columns = 4;
+                    const maxTerms = columns * 2;
+                    return {
+                      maxTerms,
+                      constructBucketItemClassName: ({
+                        bucket,
+                        showingBuckets,
+                        i,
+                        showingMore,
+                      }) =>
+                        `row_${Math.floor(i / columns)} col_${i % columns} ${
+                          Math.floor(i / columns) ===
+                          Math.floor((showingBuckets.length - 1) / columns)
+                            ? 'last_row'
+                            : ''
+                        } ${
+                          showingBuckets.length <= columns ? 'only_row' : ''
+                        }`,
+                    };
+                  })()
+                : {}),
+              key: path,
+              field: path,
+              getRangeAggProps: () => {
+                return {
+                  step: metaData.rangeStep,
+                };
+              },
+              onValueChange: ({ sqon, value }) => {
+                this.setState(
+                  {
+                    focusedPath: path,
+                  },
+                  () => {
+                    onValueChange({ sqon, value });
+                    onTermSelected?.(value);
+                  },
+                );
+              },
+              highlightText: searchString,
+              sqon,
+              facetView: true,
+              WrapperComponent: ({ displayName, collapsible, children }) => (
+                <div id={serializeToDomId(path)} className={`facetContainer`}>
+                  <div className={`header`}>
+                    <div className={`title`}>
+                      <TextHighlight
+                        content={displayName}
+                        highlightText={searchString}
+                      />
+                    </div>
+                    <div className={`breadscrumbs`}>
+                      {pathDisplayNames
+                        .slice(0, -1)
+                        .map((pathName, index, arr) => (
+                          <span key={index} className={`breadscrumb-item`}>
+                            {pathName}
+                          </span>
+                        ))}
+                    </div>
                   </div>
-                  <div className={`breadscrumbs`}>
-                    {pathDisplayNames
-                      .slice(0, -1)
-                      .map((pathName, index, arr) => (
-                        <span key={index} className={`breadscrumb-item`}>
-                          {pathName}
-                        </span>
-                      ))}
-                  </div>
+                  <div className={`content`}>{children}</div>
                 </div>
-                <div className={`content`}>{children}</div>
-              </div>
-            ),
-          });
-        })}
+              ),
+            });
+          })}
       </div>
     );
   }

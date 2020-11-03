@@ -544,6 +544,7 @@
 }
 .facetViewWrapper .facetsPanel .panelHeading .filterInput {
   margin-right: 10px;
+  width: 45%;
 }
 
 .facetViewWrapper .facetContainer .header {
