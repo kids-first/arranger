@@ -9,3 +9,7 @@ _build
 yarn.lock
 
 integration-tests/ui
+
+dep.py
+
+.config

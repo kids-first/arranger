@@ -1,4 +1,4 @@
-import { omit, isArray, min, max } from 'lodash';
+import { omit } from 'lodash';
 import {
   IN_OP,
   NOT_IN_OP,
@@ -8,9 +8,7 @@ import {
   OP_ALIASES,
   ARRAY_CONTENT,
   REGEX,
-  SET_ID,
   MISSING,
-  ALL_OP,
 } from '../constants';
 
 // _UNFLAT_KEY_ is a ephemeral mark for groupingOptimizer to not apply grouping
@@ -31,7 +29,7 @@ function groupingOptimizer({ op, content, pivot }) {
 }
 
 function isSpecialFilter(value) {
-  return [REGEX, SET_ID, MISSING].some(x => `${value}`.includes(x));
+  return [REGEX, MISSING].some(x => `${value}`.includes(x));
 }
 
 const applyDefaultPivots = filter => {
@@ -80,6 +78,7 @@ function normalizeFilters(filter) {
     }));
 
     const normalValues = value.filter(psv => !isSpecialFilter(psv));
+
     const filters =
       normalValues.length > 0
         ? [
@@ -96,7 +95,5 @@ function normalizeFilters(filter) {
   }
 }
 
-export default filter => {
-  const output = filter ? applyDefaultPivots(normalizeFilters(filter)) : filter;
-  return output;
-};
+export default filter =>
+  filter ? applyDefaultPivots(normalizeFilters(filter)) : filter;

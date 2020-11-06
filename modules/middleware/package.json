@@ -1,61 +1,61 @@
 {
+  "license": "AGPL-3.0-or-later",
+  "gitHead": "0d4122c0d4bd93024aaca520281f26ac13f83635",
   "name": "@kfarranger/middleware",
-  "version": "1.7.0",
-  "description": "Arranger Middleware",
-  "main": "dist/index.js",
-  "publishConfig": {
-    "access": "public"
-  },
-  "scripts": {
-    "build": "mkdir -p src && babel src --out-dir dist",
-    "prepare": "npm run build",
-    "watch": "mkdir -p src && babel src --watch --out-dir dist",
-    "flow": "flow",
-    "test": "jest"
-  },
   "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kids-first/arranger.git"
+    "url": "git+https://github.com/kids-first/arranger.git",
+    "type": "git"
   },
   "author": "OICR",
-  "license": "AGPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/kids-first/arranger/issues"
   },
-  "homepage": "https://github.com/kids-first/arranger#readme",
-  "devDependencies": {
-    "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.3.3",
-    "@babel/plugin-proposal-class-properties": "7.0.0-beta.40",
-    "@babel/plugin-proposal-export-namespace-from": "7.0.0-beta.40",
-    "@babel/plugin-proposal-object-rest-spread": "7.0.0-beta.40",
-    "@babel/plugin-proposal-optional-chaining": "7.0.0-beta.40",
-    "@babel/preset-env": "7.0.0-beta.40",
-    "@babel/preset-flow": "7.0.0-beta.40",
-    "@babel/preset-react": "7.0.0-beta.40",
-    "@babel/register": "7.0.0-beta.40",
-    "babel-core": "7.0.0-bridge.0",
-    "babel-eslint": "^8.2.1",
-    "eslint": "^4.1.1",
-    "eslint-config-prettier": "^2.9.0",
-    "eslint-plugin-flowtype": "^2.42.0",
-    "eslint-plugin-prettier": "^2.6.0",
-    "flow-bin": "^0.62.0",
-    "jest": "^22.3.0",
-    "prettier": "^1.9.2"
-  },
-  "dependencies": {
-    "body-parser": "^1.18.2",
-    "cors": "^2.8.4",
-    "date-fns": "^1.29.0",
-    "express": "^4.16.2",
-    "lodash": "^4.17.15",
-    "morgan": "^1.9.0",
-    "utf8": "^3.0.0",
-    "winston": "^2.4.0"
+  "publishConfig": {
+    "access": "public"
   },
   "jest": {
     "testURL": "http://localhost/"
   },
-  "gitHead": "0d4122c0d4bd93024aaca520281f26ac13f83635"
+  "version": "1.8.0",
+  "dependencies": {
+    "date-fns": "^1.29.0",
+    "winston": "^2.4.0",
+    "lodash": "^4.17.15",
+    "utf8": "^3.0.0",
+    "express": "^4.16.2",
+    "body-parser": "^1.18.2",
+    "morgan": "^1.9.0",
+    "cors": "^2.8.4"
+  },
+  "scripts": {
+    "test": "jest",
+    "flow": "flow",
+    "watch": "mkdir -p src && babel src --watch --out-dir dist",
+    "build": "mkdir -p src && babel src --out-dir dist",
+    "prepare": "npm run build"
+  },
+  "devDependencies": {
+    "eslint-plugin-flowtype": "^2.42.0",
+    "eslint-plugin-prettier": "^2.6.0",
+    "@babel/plugin-proposal-class-properties": "7.0.0-beta.40",
+    "jest": "^22.3.0",
+    "babel-eslint": "^8.2.1",
+    "prettier": "^1.9.2",
+    "@babel/plugin-proposal-object-rest-spread": "7.0.0-beta.40",
+    "eslint-config-prettier": "^2.9.0",
+    "@babel/preset-flow": "7.0.0-beta.40",
+    "@babel/plugin-proposal-optional-chaining": "7.0.0-beta.40",
+    "@babel/plugin-proposal-export-namespace-from": "7.0.0-beta.40",
+    "@babel/core": "^7.3.3",
+    "eslint": "^4.1.1",
+    "@babel/register": "7.0.0-beta.40",
+    "babel-core": "7.0.0-bridge.0",
+    "@babel/preset-react": "7.0.0-beta.40",
+    "flow-bin": "^0.62.0",
+    "@babel/cli": "^7.2.3",
+    "@babel/preset-env": "7.0.0-beta.40"
+  },
+  "main": "dist/index.js",
+  "homepage": "https://github.com/kids-first/arranger#readme",
+  "description": "Arranger Middleware"
 }

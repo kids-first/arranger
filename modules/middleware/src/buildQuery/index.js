@@ -210,21 +210,24 @@ function getGroupFilter({ nestedFields, filter: { content, op, pivot } }) {
 }
 
 function getSetFilter({ nestedFields, filter, filter: { content, op } }) {
+  // set_id:xyz or [set_id:abc, ..., set_id:xyz]
+  const values = [content.value].flat();
+  const field = content.field;
   return wrapFilter({
     isNot: op === NOT_IN_OP,
     filter,
     nestedFields,
-    esFilter: {
+    esFilter: values.map(setId => ({
       terms: {
         boost: 0,
-        [content.field]: {
+        [field]: {
           index: ES_ARRANGER_SET_INDEX,
           type: ES_ARRANGER_SET_TYPE,
-          id: _.flatMap([content.value])[0].replace('set_id:', ''),
+          id: setId.replace('set_id:', ''),
           path: 'ids',
         },
       },
-    },
+    })),
   });
 }
 
