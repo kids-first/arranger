@@ -9,6 +9,7 @@ import {
   ARRAY_CONTENT,
   REGEX,
   MISSING,
+  SET_ID,
 } from '../constants';
 
 // _UNFLAT_KEY_ is a ephemeral mark for groupingOptimizer to not apply grouping
@@ -29,7 +30,7 @@ function groupingOptimizer({ op, content, pivot }) {
 }
 
 function isSpecialFilter(value) {
-  return [REGEX, MISSING].some(x => `${value}`.includes(x));
+  return [REGEX, SET_ID, MISSING].some(x => `${value}`.includes(x));
 }
 
 const applyDefaultPivots = filter => {
@@ -51,7 +52,6 @@ const applyDefaultPivots = filter => {
 
 function normalizeFilters(filter) {
   const { op, content } = filter;
-
   if (!op) {
     throw Error(`Must specify "op" in filters: ${filter}`);
   } else if (!content) {
@@ -87,7 +87,13 @@ function normalizeFilters(filter) {
           ]
         : specialFilters;
 
-    return normalizeFilters({ op: OR_OP, content: filters });
+    const newOP =
+      // maybe this condition could be relaxed to (op === NOT_IN_OP)
+      // but couldn't test for the others special filters.
+      op === NOT_IN_OP && value.every(val => val.startsWith(SET_ID))
+        ? AND_OP
+        : OR_OP;
+    return normalizeFilters({ op: newOP, content: filters });
   } else if ([AND_OP, OR_OP, NOT_OP].includes(op)) {
     return groupingOptimizer(filter);
   } else {

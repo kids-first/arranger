@@ -65,38 +65,56 @@ test('buildQuery sets when multiple set ids not-in', () => {
   });
   expect(actualOutput).toEqual({
     bool: {
-      must_not: [
+      must: [
         {
-          terms: {
-            boost: 0,
-            case_id: {
-              id: 'aaa',
-              index: 'arranger-sets',
-              path: 'ids',
-              type: 'arranger-sets',
-            },
+          bool: {
+            must_not: [
+              {
+                terms: {
+                  boost: 0,
+                  case_id: {
+                    id: 'aaa',
+                    index: 'arranger-sets',
+                    path: 'ids',
+                    type: 'arranger-sets',
+                  },
+                },
+              },
+            ],
           },
         },
         {
-          terms: {
-            boost: 0,
-            case_id: {
-              id: 'bbb',
-              index: 'arranger-sets',
-              path: 'ids',
-              type: 'arranger-sets',
-            },
+          bool: {
+            must_not: [
+              {
+                terms: {
+                  boost: 0,
+                  case_id: {
+                    id: 'bbb',
+                    index: 'arranger-sets',
+                    path: 'ids',
+                    type: 'arranger-sets',
+                  },
+                },
+              },
+            ],
           },
         },
         {
-          terms: {
-            boost: 0,
-            case_id: {
-              id: 'ccc',
-              index: 'arranger-sets',
-              path: 'ids',
-              type: 'arranger-sets',
-            },
+          bool: {
+            must_not: [
+              {
+                terms: {
+                  boost: 0,
+                  case_id: {
+                    id: 'ccc',
+                    index: 'arranger-sets',
+                    path: 'ids',
+                    type: 'arranger-sets',
+                  },
+                },
+              },
+            ],
           },
         },
       ],
@@ -115,41 +133,51 @@ test('buildQuery sets when multiple set ids in', () => {
       op: 'in',
     },
   });
-  expect(actualOutput).toEqual([
-    {
-      terms: {
-        boost: 0,
-        case_id: {
-          id: 'aaa',
-          index: 'arranger-sets',
-          path: 'ids',
-          type: 'arranger-sets',
-        },
-      },
+  expect(actualOutput).toEqual({
+    bool: {
+      should: [
+        [
+          {
+            terms: {
+              boost: 0,
+              case_id: {
+                id: 'aaa',
+                index: 'arranger-sets',
+                path: 'ids',
+                type: 'arranger-sets',
+              },
+            },
+          },
+        ],
+        [
+          {
+            terms: {
+              boost: 0,
+              case_id: {
+                id: 'bbb',
+                index: 'arranger-sets',
+                path: 'ids',
+                type: 'arranger-sets',
+              },
+            },
+          },
+        ],
+        [
+          {
+            terms: {
+              boost: 0,
+              case_id: {
+                id: 'ccc',
+                index: 'arranger-sets',
+                path: 'ids',
+                type: 'arranger-sets',
+              },
+            },
+          },
+        ],
+      ],
     },
-    {
-      terms: {
-        boost: 0,
-        case_id: {
-          id: 'bbb',
-          index: 'arranger-sets',
-          path: 'ids',
-          type: 'arranger-sets',
-        },
-      },
-    },
-    {
-      terms: {
-        boost: 0,
-        case_id: {
-          id: 'ccc',
-          index: 'arranger-sets',
-          path: 'ids',
-          type: 'arranger-sets',
-        },
-      },
-    },
-  ]);
+  });
 });
 
 test('buildQuery sets when nested field', () => {
