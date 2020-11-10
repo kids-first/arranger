@@ -16,7 +16,7 @@
   "jest": {
     "testURL": "http://localhost/"
   },
-  "version": "1.8.0",
+  "version": "1.8.1",
   "dependencies": {
     "date-fns": "^1.29.0",
     "winston": "^2.4.0",
