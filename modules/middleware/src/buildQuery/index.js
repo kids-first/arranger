@@ -49,7 +49,7 @@ const wrapFilter = ({ esFilter, nestedFields, filter, isNot }) => {
     .filter(p => nestedFields.includes(p))
     .reverse()
     .reduce(
-      (esFilter, path, i) => wrapNested(esFilter, path),
+      (esFilter, path) => wrapNested(esFilter, path),
       isNot ? wrapMustNot(esFilter) : esFilter,
     );
 };
@@ -301,7 +301,9 @@ export const opSwitch = ({ nestedFields, filter }) => {
 };
 
 export default function({ nestedFields, filters: rawFilters }) {
-  if (Object.keys(rawFilters || {}).length === 0) return {};
+  if (Object.keys(rawFilters || {}).length === 0) {
+    return {};
+  }
   return opSwitch({
     nestedFields,
     filter: normalizeFilters(rawFilters),
