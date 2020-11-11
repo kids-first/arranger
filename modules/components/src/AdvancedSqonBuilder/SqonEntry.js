@@ -28,21 +28,6 @@ export default class SqonEntry extends Component {
     onSqonChange: sqon => {},
   };
 
-  state = {
-    hoverring: false,
-  };
-
-  hoverStart = () => {
-    this.setState({
-      hoverring: true,
-    });
-  };
-  hoverEnd = () => {
-    this.setState({
-      hoverring: false,
-    });
-  };
-
   onFieldOpRemove = removedPath => {
     const { syntheticSqon, onSqonChange } = this.props;
     return onSqonChange(removeSqonPath(removedPath)(syntheticSqon));
@@ -100,8 +85,6 @@ export default class SqonEntry extends Component {
         name={'SQON_PARTICIPANTS_COUNT'}
         render={({ data, loading, error }) => (
           <div
-            onMouseEnter={this.hoverStart}
-            onMouseLeave={this.hoverEnd}
             className={`sqonEntry ${isActiveSqon ? 'active' : ''}`}
             onClick={onActivate}
           >
@@ -152,7 +135,7 @@ export default class SqonEntry extends Component {
             </div>
             <div
               className={`participantsCountContainer ${
-                isActiveSqon || this.state.hoverring ? 'active' : ''
+                isActiveSqon ? 'active' : ''
               } ${loading ? 'loading' : ''}`}
             >
               <ResultCountIcon
@@ -190,7 +173,6 @@ export default class SqonEntry extends Component {
               </div>
             )}
             <SqonActionComponent
-              isHoverring={this.state.hoverring}
               sqonIndex={index}
               isActive={isActiveSqon}
               isSelected={isSelected}
