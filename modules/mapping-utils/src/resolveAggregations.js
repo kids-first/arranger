@@ -15,6 +15,7 @@ export default type => async (
     offset = 0,
     filters,
     aggregations_filter_themselves,
+    no_global_aggregation = false,
     include_missing = true,
   },
   { es },
@@ -41,6 +42,7 @@ export default type => async (
     graphqlFields,
     nestedFields,
     aggregationsFilterThemselves: aggregations_filter_themselves,
+    no_global_aggregation: no_global_aggregation,
   });
 
   const body = Object.keys(query || {}).length ? { query, aggs } : { aggs };
