@@ -19,15 +19,15 @@
     }
   },
   "engineStrict": true,
-  "version": "1.16.1",
+  "version": "1.17.0",
   "dependencies": {
     "date-fns": "^1.29.0",
     "graphql-type-json": "^0.2.1",
-    "@kfarranger/schema": "1.16.1",
+    "@kfarranger/schema": "1.17.0",
     "graphql-tools": "^4.0.0",
     "apollo-link-http": "^1.5.5",
     "convert-units": "^2.3.4",
-    "@kfarranger/mapping-utils": "1.16.1",
+    "@kfarranger/mapping-utils": "1.17.0",
     "ramda": "^0.26.1",
     "express": "^4.16.3",
     "elasticsearch": "^15.1.1",
