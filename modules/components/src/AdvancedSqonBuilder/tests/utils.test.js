@@ -76,4 +76,27 @@ describe('includesSqonSet', () => {
     const sqonNull = null;
     expect(includesSqonSet(sqonNull)).toBe(false);
   });
+
+  it('should handle non-string values', () => {
+    const sqon = {
+      op: 'and',
+      content: [
+        {
+          op: 'in',
+          content: {
+            field: 'njfdhnsdjkfdn',
+            value: 1,
+          },
+        },
+        {
+          op: 'in',
+          content: {
+            field: 'family.family_compositions.composition',
+            value: [1, 12],
+          },
+        },
+      ],
+    };
+    expect(includesSqonSet(sqon)).toBe(false);
+  });
 });
