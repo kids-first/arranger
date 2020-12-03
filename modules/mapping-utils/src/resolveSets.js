@@ -1,13 +1,12 @@
 import { isFunction } from 'lodash';
 import uuid from 'uuid/v4';
-import { CONSTANTS, buildQuery } from '@kfarranger/middleware';
+import { buildQuery, CONSTANTS } from '@kfarranger/middleware';
 import {
-  isTagValid,
   addSqonToSetSqon,
-  removeSqonToSetSqon,
   makeUnique,
-  truncateIds,
+  removeSqonToSetSqon,
   retrieveIdsFromQuery,
+  truncateIds,
 } from './utils/sets';
 import mapHits from './utils/mapHits';
 
@@ -159,12 +158,6 @@ const renameTag = async ({
   userId,
   postProcessCb,
 }) => {
-  if (!isTagValid(newTag)) {
-    return {
-      updatedResults: 0,
-    };
-  }
-
   const esResponse = await es.updateByQuery({
     index: CONSTANTS.ES_ARRANGER_SET_INDEX,
     type: CONSTANTS.ES_ARRANGER_SET_TYPE,
@@ -272,11 +265,8 @@ export const saveSet = ({ types, postProcessCb }) => async (
   { type, userId, sqon, path, sort, refresh = 'WAIT_FOR', tag },
   { es },
 ) => {
-  if (tag) {
-    // if a tag is present, test early.
-    if (!isTagValid(tag) || !isFunction(postProcessCb)) {
-      return null;
-    }
+  if (tag && !isFunction(postProcessCb)) {
+    throw Error('Set post process function was not provided');
   }
   const { nested_fields: nestedFields, es_type, index } = types.find(
     ([, x]) => x.name === type,
