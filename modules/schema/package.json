@@ -1,6 +1,6 @@
 {
   "name": "@kfarranger/schema",
-  "version": "1.17.0",
+  "version": "1.19.0",
   "description": "GraphQL Schema for Data Portals",
   "main": "dist/index.js",
   "publishConfig": {
@@ -24,7 +24,7 @@
     "graphql": "^14.0.2"
   },
   "dependencies": {
-    "@kfarranger/mapping-utils": "1.17.0",
+    "@kfarranger/mapping-utils": "1.18.0",
     "@kfarranger/middleware": "1.9.0",
     "babel-polyfill": "^6.26.0",
     "elasticsearch": "^14.0.0",
