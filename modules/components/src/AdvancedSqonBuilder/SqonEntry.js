@@ -69,6 +69,7 @@ export default class SqonEntry extends Component {
       forceFetch,
       sqonDictionary = [],
       customQuery,
+      nestedArrayFields,
     } = this.props;
 
     const referenceColor = getColorForReference(index);
@@ -128,6 +129,7 @@ export default class SqonEntry extends Component {
                           referencesShouldHighlight={isActiveSqon}
                           sqonDictionary={sqonDictionary}
                           customQuery={customQuery}
+                          nestedArrayFields={nestedArrayFields}
                         />
                       )}
                 </div>

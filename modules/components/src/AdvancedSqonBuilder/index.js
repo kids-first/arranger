@@ -51,6 +51,7 @@ class AdvancedSqonBuilder extends Component {
     actionsProvider: PropTypes.object,
     sqonDictionary: PropTypes.array,
     customQuery: PropTypes.object,
+    nestedArrayFields: PropTypes.array,
   };
 
   static defaultProps = {
@@ -291,6 +292,7 @@ class AdvancedSqonBuilder extends Component {
       actionsProvider,
       sqonDictionary,
       customQuery,
+      nestedArrayFields,
     } = this.props;
 
     const selectedSyntheticSqon = syntheticSqons[currentActiveSqonIndex];
@@ -378,6 +380,7 @@ class AdvancedSqonBuilder extends Component {
                 resultCountIconProps={resultCountIconProps}
                 sqonDictionary={sqonDictionary}
                 customQuery={customQuery}
+                nestedArrayFields={nestedArrayFields}
               />
             ))}
             <div>

@@ -4,14 +4,16 @@ import get from 'lodash/get';
 import './FilterContainerStyle.css';
 import { FilterContainer } from './common';
 import {
-  getOperationAtPath,
-  setSqonAtPath,
-  FIELD_OP_DISPLAY_NAME,
-  TERM_OPS,
-  IN_OP,
-  AND_OP,
   ActionContext,
+  ALL_OP,
+  AND_OP,
+  FIELD_OP_DISPLAY_NAME,
+  getOperationAtPath,
+  IN_OP,
   includesSqonSet,
+  NOT_IN_OP,
+  setSqonAtPath,
+  SOME_NOT_IN_OP,
 } from '../utils';
 import TermAgg from '../../Aggs/TermAgg';
 import TextFilter from '../../TextFilter';
@@ -89,12 +91,16 @@ export class TermFilterUI extends React.Component {
     );
   };
 
-  onOptionTypeChange = e => {
+  onOptionTypeChange = (nestedArrayFields, field, e) => {
     const currentFieldSqon = this.getCurrentFieldOp();
+    const op =
+      nestedArrayFields.includes(field) && e.target.value === NOT_IN_OP
+        ? SOME_NOT_IN_OP
+        : e.target.value;
     this.setState({
       localSqon: setSqonAtPath(this.props.sqonPath, {
         ...currentFieldSqon,
-        op: e.target.value,
+        op: op,
       })(this.state.localSqon),
     });
   };
@@ -167,6 +173,7 @@ export class TermFilterUI extends React.Component {
       fieldDisplayNameMap,
       opDisplayNameMap,
       sqonDictionary,
+      nestedArrayFields,
     } = this.props;
 
     const computedBuckets = this.computeBuckets(buckets);
@@ -190,10 +197,16 @@ export class TermFilterUI extends React.Component {
           <span>{fieldDisplayName}</span> is{' '}
           <span className="select">
             <select
-              onChange={this.onOptionTypeChange}
-              value={this.getCurrentFieldOp().op}
+              onChange={e =>
+                this.onOptionTypeChange(nestedArrayFields, field, e)
+              }
+              value={
+                this.getCurrentFieldOp().op === 'some-not-in'
+                  ? 'not-in'
+                  : this.getCurrentFieldOp().op
+              }
             >
-              {TERM_OPS.map(option => (
+              {[IN_OP, ALL_OP, NOT_IN_OP].map(option => (
                 <option key={option} value={option}>
                   {opDisplayNameMap[option]}
                 </option>
@@ -269,6 +282,7 @@ export default props => {
     opDisplayNameMap = FIELD_OP_DISPLAY_NAME,
     sqonDictionary,
     customQuery,
+    nestedArrayFields,
   } = props;
 
   const gqlField = field.split('.').join('__');
@@ -278,10 +292,9 @@ export default props => {
 
   const shouldSetTermFilter = isCurrentFieldSet && customQuery;
 
-  const query =
-      shouldSetTermFilter
-      ? customQuery.body
-      : `query($sqon: JSON){
+  const query = shouldSetTermFilter
+    ? customQuery.body
+    : `query($sqon: JSON){
     ${arrangerProjectIndex} {
       aggregations(filters: $sqon) {
         ${gqlField} {
@@ -338,6 +351,7 @@ export default props => {
           opDisplayNameMap={opDisplayNameMap}
           buckets={getBuckets(data)}
           sqonDictionary={sqonDictionary}
+          nestedArrayFields={nestedArrayFields}
         />
       )}
     />

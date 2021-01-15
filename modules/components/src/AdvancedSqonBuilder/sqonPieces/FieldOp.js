@@ -8,6 +8,8 @@ import {
   FIELD_OP_DISPLAY_NAME,
   RANGE_OPS,
   TERM_OPS,
+  SOME_NOT_IN_OP,
+  NOT_IN_OP,
 } from '../utils';
 import FieldOpModifier from '../filterComponents/index';
 import ClickAwayListener from '../../utils/ClickAwayListener.js';
@@ -57,6 +59,7 @@ export default props => {
     getActiveExecutableSqon,
     sqonDictionary,
     customQuery,
+    nestedArrayFields,
   } = props;
 
   const fieldOpObj = getOperationAtPath(sqonPath)(fullSyntheticSqon);
@@ -79,6 +82,11 @@ export default props => {
 
   const formattedValue = formatDisplayValue(value, sqonDictionary);
 
+  const getOpDisplayName = (field, op) =>
+    nestedArrayFields.includes(field) && op === SOME_NOT_IN_OP
+      ? opDisplayNameMap[NOT_IN_OP]
+      : opDisplayNameMap[op];
+
   return (
     <Component initialState={initialState}>
       {s => {
@@ -95,7 +103,7 @@ export default props => {
                     {` is ${
                       (RANGE_OPS.includes(op) || TERM_OPS.includes(op)) &&
                       !(isEqual(value, ['true']) || isEqual(value, ['false']))
-                        ? opDisplayNameMap[op]
+                        ? getOpDisplayName(field, op)
                         : ''
                     } `}
                   </span>
@@ -132,6 +140,7 @@ export default props => {
                         api={api}
                         sqonDictionary={sqonDictionary}
                         customQuery={customQuery}
+                        nestedArrayFields={nestedArrayFields}
                       />
                     </div>
                   )}
