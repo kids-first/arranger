@@ -27,6 +27,7 @@ const FieldOpModifier = ({
   getExecutableSqon = () => initialSqon,
   sqonDictionary,
   customQuery,
+  nestedArrayFields,
 }) => (
   <ExtendedMappingProvider
     api={api}
@@ -58,6 +59,7 @@ const FieldOpModifier = ({
           ContainerComponent={ContainerComponent}
           sqonDictionary={sqonDictionary}
           customQuery={customQuery}
+          nestedArrayFields={nestedArrayFields}
         />
       ) : ['long', 'float', 'integer', 'date'].includes(type) ? (
         <RangeFilter
