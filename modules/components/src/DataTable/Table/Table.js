@@ -193,7 +193,8 @@ class DataTable extends React.Component {
           columns={columns.map(
             ({ Cell, ...c }) => ({
               ...c,
-              ...(!c.hasCustomType && !isEmpty(c.extendedDisplayValues)
+              ...((!c.hasCustomType && !isEmpty(c.extendedDisplayValues)) ||
+              c.isArray
                 ? {
                     accessor: x => {
                       const values = c.accessor

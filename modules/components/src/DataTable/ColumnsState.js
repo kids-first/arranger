@@ -180,6 +180,7 @@ export default class extends Component {
                 show:
                   column.field in toggled ? toggled[column.field] : column.show,
                 extendedDisplayValues: extendedField?.displayValues,
+                isArray: extendedField?.isArray,
               };
             }),
           },
