@@ -12,9 +12,10 @@
   "scripts": {
     "start": "DEPS=`node getDependencies.js` && cd .. && nodemon $DEPS server/index.js",
     "run-prod": "node index.js",
-    "prepare": "rm -rf dist && mkdir dist && babel src --ignore */**/__tests__ --out-dir dist",
+    "prepare": "npm run snyk-protect && rm -rf dist && mkdir dist && babel src --ignore */**/__tests__ --out-dir dist",
     "test": "jest",
-    "watch": "rm -rf dist && mkdir dist && babel src --watch --out-dir dist"
+    "watch": "rm -rf dist && mkdir dist && babel src --watch --out-dir dist",
+    "snyk-protect": "snyk protect"
   },
   "repository": {
     "type": "git",
@@ -46,7 +47,8 @@
     "tar-stream": "^1.5.5",
     "through2": "^2.0.3",
     "url-join": "^4.0.0",
-    "uuid": "^3.2.1"
+    "uuid": "^3.2.1",
+    "snyk": "^1.575.0"
   },
   "devDependencies": {
     "@babel/cli": "7.8.4",
@@ -61,5 +63,6 @@
   "jest": {
     "testURL": "http://localhost/"
   },
-  "gitHead": "0d4122c0d4bd93024aaca520281f26ac13f83635"
+  "gitHead": "0d4122c0d4bd93024aaca520281f26ac13f83635",
+  "snyk": true
 }
